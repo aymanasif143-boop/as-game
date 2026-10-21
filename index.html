@@ -1,641 +1,299 @@
-```html
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AS Money Pay</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts - Hind Siliguri for beautiful Bengali typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            gold: '#FFB800',
-                            orange: '#FF5722',
-                            red: '#E53935',
-                            darkRed: '#B71C1C',
-                            bgGradStart: '#FFE57F',
-                            bgGradEnd: '#FFAB00'
-                        }
-                    },
-                    fontFamily: {
-                        bengali: ['Hind Siliguri', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
+    <title>AS Gaming - Hill Climb</title>
     <style>
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-            background: linear-gradient(180deg, #FFC107 0%, #FF9800 50%, #F44336 100%);
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Impact', 'Arial Black', sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #111; }
+        
+        #game-container { position: relative; width: 100vw; height: 100vh; background: #87CEEB; }
+        canvas { display: block; width: 100%; height: 100%; }
 
-        /* Ticker Animation */
-        @keyframes slideUp {
-            0% { transform: translateY(100%); opacity: 0; }
-            15% { transform: translateY(0); opacity: 1; }
-            85% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100%); opacity: 0; }
-        }
+        /* UI Screens */
+        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
+        
+        /* Splash Screen */
+        #splash-screen { background: #0a0a0a; color: #fff; animation: fadeOut 0.5s 2s forwards; }
+        .logo-box { background: linear-gradient(45deg, #ff0055, #ff5500); padding: 20px 40px; border-radius: 20px; box-shadow: 0 0 30px #ff5500; text-align: center; }
+        
+        /* Main Menu */
+        #main-menu { background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); }
+        .top-bar { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; }
+        .stat-card { background: rgba(0,0,0,0.6); border: 2px solid #ffd700; padding: 8px 20px; border-radius: 25px; color: #ffd700; font-size: 20px; }
 
-        .ticker-animate {
-            animation: slideUp 4s infinite ease-in-out;
-        }
+        .menu-title { font-size: 48px; color: #fff; text-shadow: 3px 3px 0 #000, -2px -2px 0 #ff5500; margin-bottom: 10px; }
+        .subtitle { font-size: 20px; color: #ffd700; margin-bottom: 30px; }
 
-        /* Glassmorphism effects */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
+        .garage-view { width: 320px; height: 180px; background: rgba(255,255,255,0.1); border: 4px solid #fff; border-radius: 15px; display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 20px; }
+        
+        .btn { background: linear-gradient(0deg, #28a745, #34ce57); border: 3px solid #fff; border-radius: 12px; color: #fff; font-size: 24px; padding: 12px 40px; cursor: pointer; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #1e7e34; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1e7e34; }
+        
+        /* In-Game Controls */
+        .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: none; }
+        .pedal { width: 90px; height: 110px; background: #333; border: 4px solid #aaa; border-radius: 15px; display: flex; justify-content: center; align-items: center; color: white; font-size: 18px; pointer-events: auto; touch-action: manipulation; box-shadow: 0 8px 0 #111; }
+        .pedal:active { transform: translateY(4px); box-shadow: 0 4px 0 #111; }
+        #btn-gas { background: linear-gradient(180deg, #28a745, #155724); border-color: #5cdb95; }
+        #btn-brake { background: linear-gradient(180deg, #dc3545, #721c24); border-color: #ff7b89; }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
+        #game-hud { position: absolute; top: 15px; left: 15px; z-index: 20; pointer-events: none; color: white; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+        
+        /* Game Over */
+        #game-over { background: rgba(0,0,0,0.85); display: none; }
+        .go-title { color: #ff3333; font-size: 50px; text-shadow: 3px 3px 0 #000; margin-bottom: 15px; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
-<body class="flex flex-col items-center justify-between min-h-screen text-gray-800 pb-20 pt-2">
+<body>
 
-    <!-- Top Navigation Header -->
-    <header class="w-full max-w-md px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="relative">
-                <img id="user-avatar" src="https://placehold.co/100x100/FF5722/ffffff?text=AS" alt="User Avatar" class="w-12 h-12 rounded-full border-2 border-white shadow-md object-cover">
-                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
-            </div>
-            <div>
-                <h1 class="text-base font-bold text-gray-900 leading-tight flex items-center gap-1" id="user-name">
-                    HI, ARIYAN <i class="fa-solid fa-circle-check text-blue-600 text-xs"></i>
-                </h1>
-                <p class="text-[11px] font-semibold text-gray-800 tracking-wide bg-amber-200/80 px-2 py-0.5 rounded-full inline-block mt-0.5">
-                    WELCOME TO AS MONEY PAY
-                </p>
-            </div>
-        </div>
-        <button onclick="switchTab('profile')" class="w-10 h-10 rounded-full bg-white/80 shadow flex items-center justify-center text-gray-700 hover:bg-white active:scale-95 transition">
-            <i class="fa-solid fa-bell text-lg text-amber-600"></i>
-        </button>
-    </header>
-
-    <!-- Main Container -->
-    <main class="w-full max-w-md px-4 space-y-4 flex-1">
-
-        <!-- TAB 1: HOME PAGE -->
-        <div id="tab-home" class="space-y-4">
-            
-            <!-- Balance Card -->
-            <div class="glass-card rounded-2xl p-5 shadow-xl text-center relative overflow-hidden border-2 border-amber-300">
-                <div class="absolute -right-6 -top-6 w-20 h-20 bg-amber-400/20 rounded-full blur-xl"></div>
-                <p class="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">আপনার বর্তমান ব্যালেন্স (TOTAL BALANCE)</p>
-                <div class="text-4xl font-black text-amber-600 flex items-center justify-center gap-1 my-1">
-                    <span class="text-3xl">৳</span>
-                    <span id="current-balance">10.00</span>
-                </div>
-                <div class="mt-3">
-                    <button onclick="openWithdrawModal()" class="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-wallet text-lg"></i>
-                        <span>Withdraw Money (টাকা তুলুন)</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Task 1: Watch Video Ads -->
-            <div class="glass-card rounded-2xl p-4 shadow-md border-l-4 border-amber-500 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-11 h-11 bg-red-100 text-red-600 rounded-xl flex items-center justify-center shadow-inner">
-                            <i class="fa-solid fa-circle-play text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-sm">কাজ করুন (ভিডিও দেখুন)</h3>
-                            <p class="text-xs text-gray-500">ভিডিও দেখুন এবং পয়েন্ট আয় করুন</p>
-                        </div>
-                    </div>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">+৳২.৫০</span>
-                </div>
-                <button onclick="startVideoTask()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play text-xs"></i>
-                    <span>কাজ শুরু করুন</span>
-                </button>
-            </div>
-
-            <!-- Task 2: Install Apps -->
-            <div class="glass-card rounded-2xl p-4 shadow-md border-l-4 border-orange-500 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-11 h-11 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center shadow-inner">
-                            <i class="fa-solid fa-download text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-sm">NEXORA অ্যাপ ইনস্টল করুন</h3>
-                            <p class="text-xs text-gray-500">অ্যাপ ইনস্টল করে বোনাস নিন</p>
-                        </div>
-                    </div>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">+৳৫.০০</span>
-                </div>
-                <button onclick="startAppInstallTask()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-box-archive text-xs"></i>
-                    <span>ইনস্টল টাস্ক খুলুন</span>
-                </button>
-            </div>
-
-            <!-- Refer & Earn Card -->
-            <div class="glass-card rounded-2xl p-4 shadow-md bg-gradient-to-br from-white to-amber-50 border border-amber-200">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-users text-amber-600"></i>
-                        <span>বন্ধুদের রেফার করে আয় করুন</span>
-                    </h3>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div class="bg-amber-100/70 p-2.5 rounded-xl text-center">
-                        <p class="text-[11px] text-gray-600 font-medium">মোট রেফারেল</p>
-                        <p id="ref-count" class="text-lg font-bold text-amber-800">০</p>
-                    </div>
-                    <div class="bg-amber-100/70 p-2.5 rounded-xl text-center">
-                        <p class="text-[11px] text-gray-600 font-medium">রেফার আয় (টাকা)</p>
-                        <p id="ref-earned" class="text-lg font-bold text-emerald-700">189.00</p>
-                    </div>
-                </div>
-
-                <button onclick="copyReferralLink()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-share-nodes"></i>
-                    <span>আপনার রেফার লিঙ্ক কপি করুন</span>
-                </button>
-            </div>
-
-            <!-- Tutorials Section -->
-            <div class="glass-card rounded-2xl p-4 shadow-md text-center">
-                <p class="text-xs text-gray-600 font-semibold mb-2">কাজ বুঝতে সমস্যা হলে ভিডিও টিউটোরিয়াল দেখুন</p>
-                <button onclick="playTutorialVideo()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play-circle text-lg"></i>
-                    <span>টিউটোরিয়াল ভিডিও দেখুন</span>
-                </button>
-            </div>
-
-        </div>
-
-        <!-- TAB 2: TASKS LIST -->
-        <div id="tab-tasks" class="space-y-3 hidden">
-            <div class="glass-card p-4 rounded-2xl text-center">
-                <h2 class="font-bold text-gray-800 text-base">সকল কাজের তালিকা</h2>
-                <p class="text-xs text-gray-500">দৈনিক টাস্ক সম্পন্ন করে বেশি আয় করুন</p>
-            </div>
-
-            <!-- Task Item 1 -->
-            <div class="glass-card p-3.5 rounded-xl flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-video text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-xs text-gray-800">স্পনসর ভিডিও অ্যাড #১</h4>
-                        <p class="text-[10px] text-gray-500">সময়: ৩০ সেকেন্ড</p>
-                    </div>
-                </div>
-                <button onclick="startVideoTask()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95">দেখুন (+৳১)</button>
-            </div>
-
-            <!-- Task Item 2 -->
-            <div class="glass-card p-3.5 rounded-xl flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-[#1877F2] fa-facebook text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-xs text-gray-800">ফেসবুক পেজ লাইক</h4>
-                        <p class="text-[10px] text-gray-500">অফিসিয়াল পেজে যুক্ত হন</p>
-                    </div>
-                </div>
-                <button onclick="completeSimpleTask('ফেসবুক পেজ লাইক', 2)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95">লাইক (+৳২)</button>
-            </div>
-
-            <!-- Task Item 3 -->
-            <div class="glass-card p-3.5 rounded-xl flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-sky-100 text-sky-600 rounded-lg flex items-center justify-center">
-                        <i class="fa-brands fa-telegram text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-xs text-gray-800">টেলিগ্রাম চ্যানেলে জয়েন</h4>
-                        <p class="text-[10px] text-gray-500">পেমেন্ট প্রুফ ও আপডেট</p>
-                    </div>
-                </div>
-                <button onclick="completeSimpleTask('টেলিগ্রাম চ্যানেল জয়েন', 3)" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95">জয়েন (+৳৩)</button>
-            </div>
-        </div>
-
-        <!-- TAB 3: WALLET & HISTORY -->
-        <div id="tab-wallet" class="space-y-3 hidden">
-            <div class="glass-card p-4 rounded-2xl text-center">
-                <p class="text-xs text-gray-500">মোট উত্তোলন করা হয়েছে</p>
-                <h2 class="text-2xl font-black text-amber-700">৳ <span id="total-withdrawn">0.00</span></h2>
-                <button onclick="openWithdrawModal()" class="mt-3 w-full bg-red-600 text-white font-bold py-2.5 rounded-xl shadow active:scale-95">নতুন টাকা তুলুন (Withdraw)</button>
-            </div>
-
-            <div class="glass-card p-4 rounded-2xl">
-                <h3 class="font-bold text-sm text-gray-800 mb-2">উত্তোলনের হিস্ট্রি (Withdraw History)</h3>
-                <div id="history-list" class="space-y-2 text-xs">
-                    <p class="text-center text-gray-400 py-4">এখনো পর্যন্ত কোনো উত্তোলনের রিকোয়েস্ট করা হয়নি।</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 4: PROFILE -->
-        <div id="tab-profile" class="space-y-3 hidden">
-            <div class="glass-card p-5 rounded-2xl text-center">
-                <img src="https://placehold.co/120x120/FF5722/ffffff?text=AS" class="w-20 h-20 rounded-full mx-auto border-4 border-amber-400 shadow mb-2">
-                <h2 class="font-bold text-base text-gray-900">Ariyan Ahmed</h2>
-                <p class="text-xs text-gray-500">ইউজার আইডি: #894721</p>
-                <span class="inline-block mt-2 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full">একাউন্ট ভেরিফাইড (Verified)</span>
-            </div>
-
-            <div class="glass-card rounded-2xl overflow-hidden divide-y divide-gray-100 text-sm font-medium">
-                <div class="p-3.5 flex justify-between items-center hover:bg-amber-50 cursor-pointer">
-                    <span class="text-gray-700"><i class="fa-solid fa-shield-halved text-amber-600 w-6"></i> নিরাপত্তা ও গোপনীয়তা</span>
-                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-                </div>
-                <div class="p-3.5 flex justify-between items-center hover:bg-amber-50 cursor-pointer" onclick="alert('হেল্পলাইন টেলিগ্রাম ইউজারনেম: @AS_Money_Support')">
-                    <span class="text-gray-700"><i class="fa-solid fa-headset text-amber-600 w-6"></i> সাপোর্ট ও সাহায্য</span>
-                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- LIVE PAYOUT TICKER (Floating Bottom Notification) -->
-    <div class="w-full max-w-md px-4 my-2">
-        <div class="bg-gray-900/90 backdrop-blur-md text-white rounded-2xl p-2.5 shadow-2xl border border-amber-400/40 flex items-center space-x-3 overflow-hidden">
-            <div class="w-9 h-9 rounded-xl bg-amber-500 text-gray-900 flex items-center justify-center font-bold text-lg flex-shrink-0 shadow">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <div class="flex-1 overflow-hidden h-9 flex items-center">
-                <div id="ticker-text" class="text-xs leading-tight w-full font-medium">
-                    <!-- Dynamic Ticker content inserted via JS -->
-                </div>
-            </div>
+<div id="game-container">
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="overlay-screen">
+        <div class="logo-box">
+            <h1 style="font-size: 42px; color: #fff;">AS GAMING</h1>
+            <p style="color: #ffd700; margin-top: 5px;">WELCOME</p>
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION TAB BAR -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 shadow-2xl rounded-t-2xl px-6 py-2 flex justify-between items-center z-40">
-        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-amber-600 active:scale-95 transition">
-            <i class="fa-solid fa-house text-lg"></i>
-            <span class="text-[10px] font-bold mt-0.5">হোম</span>
-        </button>
-        <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center text-gray-400 hover:text-amber-600 active:scale-95 transition">
-            <i class="fa-solid fa-list-check text-lg"></i>
-            <span class="text-[10px] font-bold mt-0.5">টাস্ক</span>
-        </button>
-        <button onclick="switchTab('wallet')" id="nav-wallet" class="flex flex-col items-center text-gray-400 hover:text-amber-600 active:scale-95 transition">
-            <i class="fa-solid fa-wallet text-lg"></i>
-            <span class="text-[10px] font-bold mt-0.5">উইথড্র</span>
-        </button>
-        <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-amber-600 active:scale-95 transition">
-            <i class="fa-solid fa-user text-lg"></i>
-            <span class="text-[10px] font-bold mt-0.5">প্রোফাইল</span>
-        </button>
-    </nav>
-
-    <!-- WITHDRAWAL MODAL -->
-    <div id="withdraw-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 hidden">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 animate-slide-up">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-money-bill-transfer text-amber-600"></i>
-                    <span>টাকা তুলুন (Withdraw)</span>
-                </h3>
-                <button onclick="closeWithdrawModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Payment Method Selection -->
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-2">পেমেন্ট মেথড সিলেক্ট করুন</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" onclick="selectMethod('bKash')" id="method-bKash" class="method-btn border-2 border-amber-500 bg-amber-50 rounded-xl p-2.5 text-center transition">
-                        <span class="block text-xs font-bold text-pink-600">বিকাশ</span>
-                        <span class="text-[10px] text-gray-500">bKash</span>
-                    </button>
-                    <button type="button" onclick="selectMethod('Nagad')" id="method-Nagad" class="method-btn border-2 border-gray-200 rounded-xl p-2.5 text-center transition">
-                        <span class="block text-xs font-bold text-orange-600">নগদ</span>
-                        <span class="text-[10px] text-gray-500">Nagad</span>
-                    </button>
-                    <button type="button" onclick="selectMethod('Rocket')" id="method-Rocket" class="method-btn border-2 border-gray-200 rounded-xl p-2.5 text-center transition">
-                        <span class="block text-xs font-bold text-purple-600">রকেট</span>
-                        <span class="text-[10px] text-gray-500">Rocket</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Number Input -->
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">একাউন্ট নাম্বার দিন</label>
-                <input type="number" id="withdraw-number" placeholder="017XXXXXXXX" class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-500">
-            </div>
-
-            <!-- Amount Input -->
-            <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">উত্তোলনের পরিমাণ (টাকা)</label>
-                <input type="number" id="withdraw-amount" placeholder="সর্বনিম্ন ২০ টাকা" class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:border-amber-500">
-                <p class="text-[11px] text-amber-700 font-medium mt-1">* সর্বনিম্ন উত্তোলন ২০.০০ টাকা</p>
-            </div>
-
-            <!-- Submit Button -->
-            <button onclick="processWithdrawal()" class="w-full bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">
-                রিকোয়েস্ট সাবমিট করুন
-            </button>
+    <!-- Main Menu -->
+    <div id="main-menu" class="overlay-screen" style="display: none;">
+        <div class="top-bar">
+            <div class="stat-card">🪙 <span id="menu-coins">0</span></div>
+            <div class="stat-card" style="border-color: #00ffff; color: #00ffff;">AS PLAY</div>
         </div>
-    </div>
 
-    <!-- VIDEO AD PLAYING SIMULATOR MODAL -->
-    <div id="video-modal" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center p-4 z-50 hidden">
-        <div class="w-full max-w-sm bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
-            <!-- Simulated Video Screen -->
-            <div class="relative aspect-video bg-black flex items-center justify-center">
-                <div id="video-placeholder" class="text-center p-4">
-                    <i class="fa-solid fa-play text-4xl text-amber-500 animate-pulse mb-2"></i>
-                    <p class="text-white text-xs font-bold">স্পনসরড অ্যাড প্লে হচ্ছে...</p>
-                </div>
-                <!-- Countdown Overlay -->
-                <div class="absolute top-3 right-3 bg-black/70 text-amber-400 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/50">
-                    <span id="video-timer">15</span>s
-                </div>
-            </div>
+        <h1 class="menu-title">AS CAR PLAYING</h1>
+        <div class="subtitle">HILL CLIMB EDITION</div>
 
-            <div class="p-4 text-center space-y-2">
-                <p class="text-xs text-gray-300">ভিডিওটি শেষ হওয়া পর্যন্ত অপেক্ষা করুন। কেটে দিলে রিওয়ার্ড যোগ হবে না।</p>
-                <button id="claim-reward-btn" disabled onclick="claimVideoReward()" class="w-full bg-gray-700 text-gray-400 font-bold py-2.5 rounded-xl transition cursor-not-allowed">
-                    পুরস্কার গ্রহণ করুন (Claim ৳২.৫০)
-                </button>
-            </div>
+        <div class="garage-view">
+            <div style="font-size: 70px;">🚜</div>
+            <div style="position: absolute; bottom: 10px; background: #ff5500; color: #fff; padding: 2px 10px; border-radius: 5px; font-size: 14px;">AS MONSTER</div>
         </div>
+
+        <button class="btn" onclick="startGame()">START GAME 🏁</button>
     </div>
 
-    <!-- GENERAL ALERT / TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-2xl border border-amber-400 flex items-center gap-2 z-50 transform -translate-y-20 opacity-0 transition-all duration-300">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toast-message">বিজ্ঞপ্তি টেক্সট</span>
+    <!-- Game Over Screen -->
+    <div id="game-over" class="overlay-screen">
+        <h1 class="go-title">DRIVER DOWN! 💥</h1>
+        <p style="color: #fff; font-size: 22px; margin-bottom: 20px;">Score: <span id="final-dist">0</span>m</p>
+        <button class="btn" onclick="restartGame()">RETRY 🔄</button>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // State Management
-        let userState = {
-            balance: 10.00,
-            totalWithdrawn: 0.0,
-            referrals: 0,
-            refEarned: 189.00,
-            selectedMethod: 'bKash',
-            history: []
-        };
+    <!-- HUD -->
+    <div id="game-hud">
+        <div>🚩 <span id="dist-val">0</span>m</div>
+        <div style="color: #ffd700; margin-top: 5px;">🪙 <span id="coin-val">0</span></div>
+    </div>
 
-        // Real-time Payout Ticker Data
-        const payoutData = [
-            { name: "নাজমুল হোসেন", amount: "১২০০০", method: "বিকাশ", phone: "018****6947" },
-            { name: "মোঃ রফিক", amount: "৫০০", method: "নগদ", phone: "017****1234" },
-            { name: "আরিয়ান খান", amount: "২০০০", method: "বিকাশ", phone: "019****8821" },
-            { name: "সুমাইয়া আক্তার", amount: "১৫০০", method: "রকেট", phone: "015****3309" },
-            { name: "কবির শেখ", amount: "৮০০", method: "নগদ", phone: "013****9012" }
-        ];
+    <!-- Controls -->
+    <div class="controls">
+        <div id="btn-brake" class="pedal">BRAKE</div>
+        <div id="btn-gas" class="pedal">GAS</div>
+    </div>
 
-        let tickerIndex = 0;
+    <canvas id="canvas"></canvas>
+</div>
 
-        // Initialize App
-        window.addEventListener('DOMContentLoaded', () => {
-            updateUI();
-            startTickerLoop();
+<script>
+    // Matter.js Aliases
+    const { Engine, Render, Runner, Bodies, Composite, Body, Constraint, Vector } = Matter;
+
+    let engine, world, render, runner;
+    let car, rearWheel, frontWheel;
+    let coins = [];
+    let scoreCoins = 0, distance = 0;
+    let isGameOver = false, isPlaying = false;
+    let gasPressed = false, brakePressed = false;
+
+    const canvas = document.getElementById('canvas');
+
+    function init() {
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }, 2200);
+
+        setupPhysics();
+        setupInput();
+    }
+
+    function setupPhysics() {
+        engine = Engine.create();
+        world = engine.world;
+
+        render = Render.create({
+            canvas: canvas,
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false,
+                background: '#70c5ce'
+            }
         });
 
-        // Update UI elements
-        function updateUI() {
-            document.getElementById('current-balance').innerText = userState.balance.toFixed(2);
-            document.getElementById('total-withdrawn').innerText = userState.totalWithdrawn.toFixed(2);
-            document.getElementById('ref-count').innerText = userState.referrals;
-            document.getElementById('ref-earned').innerText = userState.refEarned.toFixed(2);
+        Render.run(render);
+        runner = Runner.create();
+        Runner.run(runner, engine);
+    }
+
+    function createTerrainAndCar() {
+        Composite.clear(world);
+
+        // Generate Hills (Terrain)
+        const terrainPoints = [];
+        let startX = -500;
+        let startY = window.innerHeight - 150;
+        
+        for (let i = 0; i < 200; i++) {
+            startX += 80;
+            startY += Math.sin(i * 0.3) * 40 + (Math.random() * 10 - 5);
+            terrainPoints.push({ x: startX, y: startY });
         }
 
-        // Tab Navigation
-        function switchTab(tabName) {
-            const tabs = ['home', 'tasks', 'wallet', 'profile'];
-            tabs.forEach(tab => {
-                const tabEl = document.getElementById(`tab-${tab}`);
-                const navEl = document.getElementById(`nav-${tab}`);
-                if (tab === tabName) {
-                    tabEl.classList.remove('hidden');
-                    navEl.classList.add('text-amber-600');
-                    navEl.classList.remove('text-gray-400');
-                } else {
-                    tabEl.classList.add('hidden');
-                    navEl.classList.remove('text-amber-600');
-                    navEl.classList.add('text-gray-400');
+        for (let i = 0; i < terrainPoints.length - 1; i++) {
+            const p1 = terrainPoints[i];
+            const p2 = terrainPoints[i+1];
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+            const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
+            const segment = Bodies.rectangle(midX, midY, len + 5, 40, {
+                isStatic: true,
+                friction: 0.9,
+                render: { fillStyle: '#5d4037' }
+            });
+            Body.setAngle(segment, angle);
+            Composite.add(world, segment);
+
+            // Add Coins along path
+            if (i % 3 === 0 && i > 5) {
+                const coin = Bodies.circle(midX, midY - 50, 12, {
+                    isStatic: true,
+                    isSensor: true,
+                    render: { fillStyle: '#ffd700' }
+                });
+                coins.push(coin);
+                Composite.add(world, coin);
+            }
+        }
+
+        // Build AS Car
+        const carX = 100, carY = 200;
+        car = Bodies.rectangle(carX, carY, 140, 40, {
+            density: 0.005,
+            friction: 0.4,
+            render: { fillStyle: '#ff5500' } // Orange color theme
+        });
+
+        // Wheels
+        rearWheel = Bodies.circle(carX - 45, carY + 30, 26, { friction: 0.9, density: 0.01, render: { fillStyle: '#222' } });
+        frontWheel = Bodies.circle(carX + 45, carY + 30, 26, { friction: 0.9, density: 0.01, render: { fillStyle: '#222' } });
+
+        // Axles
+        const axle1 = Constraint.create({
+            bodyA: car, pointB: { x: -45, y: 30 }, bodyB: rearWheel, stiffness: 0.4, length: 0
+        });
+        const axle2 = Constraint.create({
+            bodyA: car, pointB: { x: 45, y: 30 }, bodyB: frontWheel, stiffness: 0.4, length: 0
+        });
+
+        Composite.add(world, [car, rearWheel, frontWheel, axle1, axle2]);
+    }
+
+    function setupInput() {
+        const gasBtn = document.getElementById('btn-gas');
+        const brakeBtn = document.getElementById('btn-brake');
+
+        const bindTouch = (elem, pressFn, releaseFn) => {
+            elem.addEventListener('touchstart', (e) => { e.preventDefault(); pressFn(); });
+            elem.addEventListener('touchend', (e) => { e.preventDefault(); releaseFn(); });
+            elem.addEventListener('mousedown', pressFn);
+            elem.addEventListener('mouseup', releaseFn);
+        };
+
+        bindTouch(gasBtn, () => gasPressed = true, () => gasPressed = false);
+        bindTouch(brakeBtn, () => brakePressed = true, () => brakePressed = false);
+
+        // Custom render for "AS" text on Car Body
+        Events.on(render, 'afterRender', () => {
+            if (!isPlaying || !car) return;
+            const ctx = render.context;
+            const pos = car.position;
+            const angle = car.angle;
+
+            ctx.save();
+            ctx.translate(pos.x, pos.y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 22px Impact';
+            ctx.fillText('AS', -12, 5);
+            ctx.restore();
+
+            // Camera follow car
+            Render.lookAt(render, car, { x: 300, y: 200 });
+        });
+
+        // Game Loop Updates
+        Events.on(engine, 'beforeUpdate', () => {
+            if (!isPlaying || isGameOver) return;
+
+            if (gasPressed) {
+                Body.setAngularVelocity(rearWheel, 0.25);
+                Body.setAngularVelocity(frontWheel, 0.25);
+            }
+            if (brakePressed) {
+                Body.setAngularVelocity(rearWheel, -0.15);
+                Body.setAngularVelocity(frontWheel, -0.15);
+            }
+
+            // Distance calculation
+            distance = Math.max(0, Math.floor((car.position.x - 100) / 10));
+            document.getElementById('dist-val').innerText = distance;
+
+            // Driver Down Check (Flipped Over)
+            const rot = Math.abs(car.angle % (Math.PI * 2));
+            if ((rot > 1.6 && rot < 4.7) && Math.abs(car.velocity.y) < 0.5) {
+                triggerGameOver();
+            }
+
+            // Coin collection check
+            coins.forEach((coin, idx) => {
+                if (Vector.magnitude(Vector.sub(car.position, coin.position)) < 50) {
+                    Composite.remove(world, coin);
+                    coins.splice(idx, 1);
+                    scoreCoins += 10;
+                    document.getElementById('coin-val').innerText = scoreCoins;
                 }
             });
-        }
+        });
+    }
 
-        // Live Ticker Loop
-        function startTickerLoop() {
-            const tickerEl = document.getElementById('ticker-text');
-            
-            function updateTicker() {
-                const item = payoutData[tickerIndex];
-                tickerEl.innerHTML = `
-                    <p class="font-bold text-amber-300 truncate">${item.name} ${item.amount} টাকা ${item.method} পেয়েছেন</p>
-                    <p class="text-[10px] text-gray-300">নাম্বার: ${item.phone} • সফল পেমেন্ট</p>
-                `;
-                tickerIndex = (tickerIndex + 1) % payoutData.length;
-            }
+    function startGame() {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('game-over').style.display = 'none';
+        scoreCoins = 0; distance = 0;
+        isGameOver = false; isPlaying = true;
+        createTerrainAndCar();
+    }
 
-            updateTicker();
-            setInterval(updateTicker, 3500);
-        }
+    function triggerGameOver() {
+        isGameOver = true;
+        isPlaying = false;
+        document.getElementById('final-dist').innerText = distance;
+        document.getElementById('game-over').style.display = 'flex';
+        document.getElementById('menu-coins').innerText = scoreCoins;
+    }
 
-        // Toast Notification Helper
-        function showToast(message, isSuccess = true) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
+    function restartGame() {
+        startGame();
+    }
 
-            toastMessage.innerText = message;
-            if (isSuccess) {
-                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
-            } else {
-                toastIcon.className = "fa-solid fa-triangle-exclamation text-red-400 text-base";
-            }
-
-            toast.classList.remove('-translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // Video Task Simulation
-        let timerInterval;
-        function startVideoTask() {
-            const videoModal = document.getElementById('video-modal');
-            const timerEl = document.getElementById('video-timer');
-            const claimBtn = document.getElementById('claim-reward-btn');
-
-            videoModal.classList.remove('hidden');
-            claimBtn.disabled = true;
-            claimBtn.className = "w-full bg-gray-700 text-gray-400 font-bold py-2.5 rounded-xl transition cursor-not-allowed";
-
-            let timeLeft = 10;
-            timerEl.innerText = timeLeft;
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    claimBtn.disabled = false;
-                    claimBtn.className = "w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 rounded-xl shadow active:scale-95 transition";
-                }
-            }, 1000);
-        }
-
-        function claimVideoReward() {
-            userState.balance += 2.50;
-            updateUI();
-            document.getElementById('video-modal').classList.add('hidden');
-            showToast("অভিনন্দন! ৳২.৫০ টাকা আপনার ব্যালেন্স এ যোগ করা হয়েছে।");
-        }
-
-        // App Install Task
-        function startAppInstallTask() {
-            showToast("অ্যাপ ডাউনলোড পেজে রিডাইরেক্ট করা হচ্ছে...", true);
-            setTimeout(() => {
-                userState.balance += 5.00;
-                updateUI();
-                showToast("টাস্ক সফল! ৳৫.০০ বোনাস যোগ হয়েছে।");
-            }, 2000);
-        }
-
-        // Simple Tasks
-        function completeSimpleTask(taskTitle, reward) {
-            userState.balance += reward;
-            updateUI();
-            showToast(`"${taskTitle}" সম্পন্ন হয়েছে! +৳${reward} যোগ হয়েছে।`);
-        }
-
-        // Copy Referral Link
-        function copyReferralLink() {
-            const tempInput = document.createElement("input");
-            tempInput.value = "https://t.me/AS_Money_Pay_Bot?start=ref894721";
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-
-            showToast("রেফারেল লিংক কপি করা হয়েছে!");
-        }
-
-        // Tutorial Video Button
-        function playTutorialVideo() {
-            showToast("টিউটোরিয়াল ভিডিও দেখাচ্ছে...", true);
-            startVideoTask();
-        }
-
-        // Modal Controls
-        function openWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.remove('hidden');
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.add('hidden');
-        }
-
-        function selectMethod(method) {
-            userState.selectedMethod = method;
-            ['bKash', 'Nagad', 'Rocket'].forEach(m => {
-                const btn = document.getElementById(`method-${m}`);
-                if (m === method) {
-                    btn.className = "method-btn border-2 border-amber-500 bg-amber-50 rounded-xl p-2.5 text-center transition";
-                } else {
-                    btn.className = "method-btn border-2 border-gray-200 rounded-xl p-2.5 text-center transition";
-                }
-            });
-        }
-
-        // Process Withdrawal Request
-        function processWithdrawal() {
-            const number = document.getElementById('withdraw-number').value.trim();
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
-
-            if (!number || number.length < 11) {
-                showToast("সঠিক মোবাইল নাম্বার প্রদান করুন", false);
-                return;
-            }
-
-            if (isNaN(amount) || amount < 20) {
-                showToast("সর্বনিম্ন উত্তোলন ২০.০০ টাকা", false);
-                return;
-            }
-
-            if (amount > userState.balance) {
-                showToast("আপনার একাউন্টে পর্যাপ্ত ব্যালেন্স নেই!", false);
-                return;
-            }
-
-            // Deduct balance and update state
-            userState.balance -= amount;
-            userState.totalWithdrawn += amount;
-            updateUI();
-
-            // Add to history
-            const historyList = document.getElementById('history-list');
-            if (historyList.querySelector('p')) {
-                historyList.innerHTML = '';
-            }
-
-            const historyItem = document.createElement('div');
-            historyItem.className = "bg-amber-50 p-2.5 rounded-lg flex justify-between items-center border border-amber-200";
-            historyItem.innerHTML = `
-                <div>
-                    <p class="font-bold text-gray-800">${userState.selectedMethod} (${number})</p>
-                    <p class="text-[10px] text-gray-500">${new Date().toLocaleDateString('bn-BD')}</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-bold text-amber-700">৳${amount.toFixed(2)}</p>
-                    <span class="text-[10px] text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">পেন্ডিং</span>
-                </div>
-            `;
-            historyList.prepend(historyItem);
-
-            closeWithdrawModal();
-            showToast("উত্তোলনের রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
-
-            // Reset inputs
-            document.getElementById('withdraw-number').value = '';
-            document.getElementById('withdraw-amount').value = '';
-        }
-    </script>
+    window.onload = init;
+</script>
 </body>
 </html>
-```
