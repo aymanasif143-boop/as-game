@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f0f2f5; color: #1c1e21; }
 
-        /* Auth Screen */
+        /* Auth Container */
         .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
         .auth-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
         .auth-card h2 { color: #1877f2; font-size: 32px; margin-bottom: 10px; font-weight: bold; }
@@ -16,12 +16,12 @@
         .auth-card button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .switch-link { color: #1877f2; font-size: 14px; margin-top: 15px; cursor: pointer; display: block; }
 
-        /* App Screen Header & Layout */
+        /* App Screen Layout */
         #app-screen { display: none; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         header { background: white; border-bottom: 1px solid #e4e6eb; padding: 10px 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: #1877f2; font-size: 24px; font-weight: bold; }
         .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e4e6eb; justify-content: space-around; }
-        .nav-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 18px; color: #65676b; cursor: pointer; border-bottom: 3px solid transparent; }
+        .nav-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 20px; color: #65676b; cursor: pointer; border-bottom: 3px solid transparent; }
         .nav-tab.active { color: #1877f2; border-bottom-color: #1877f2; }
 
         /* Tab Contents */
@@ -30,8 +30,8 @@
 
         /* Story Section */
         .story-container { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: white; border-bottom: 8px solid #f0f2f5; }
-        .story-box { width: 90px; height: 140px; border-radius: 10px; background: #e4e6eb; position: relative; flex-shrink: 0; overflow: hidden; display: flex; align-items: flex-end; padding: 5px; font-size: 11px; font-weight: bold; color: white; text-shadow: 0 1px 2px black; }
-        .story-box.add-story { background: #e7f3ff; color: #1877f2; text-shadow: none; justify-content: center; align-items: center; text-align: center; cursor: pointer; }
+        .story-box { width: 90px; height: 140px; border-radius: 10px; background: #1877f2; position: relative; flex-shrink: 0; overflow: hidden; display: flex; align-items: flex-end; padding: 8px; font-size: 12px; font-weight: bold; color: white; }
+        .story-box.add-story { background: #e7f3ff; color: #1877f2; justify-content: center; align-items: center; text-align: center; cursor: pointer; border: 1px dashed #1877f2; }
 
         /* Post Creation Area */
         .create-post { padding: 15px; background: white; border-bottom: 8px solid #f0f2f5; }
@@ -66,7 +66,7 @@
         .chat-footer { display: flex; padding: 10px; border-top: 1px solid #ddd; }
         .chat-footer input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
 
-        /* Call Overlay */
+        /* Call Modal Overlay */
         #call-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); color:white; z-index:1000; flex-direction:column; justify-content:center; align-items:center; }
     </style>
 </head>
@@ -74,18 +74,14 @@
 
     <!-- Auth Section -->
     <div id="auth-screen" class="auth-container">
-        <!-- Registration Form -->
+        <!-- Sign Up Form -->
         <div id="register-card" class="auth-card">
             <h2>AS Reebook</h2>
             <p style="margin-bottom:15px; color:#65676b;">নতুন অ্যাকাউন্ট তৈরি করুন</p>
-            <input type="text" id="reg-name" placeholder="পূর্ণ নাম">
+            <input type="text" id="reg-name" placeholder="আপনার পূর্ণ নাম">
             <input type="text" id="reg-phone" placeholder="মোবাইল নম্বর">
             <input type="password" id="reg-pass" placeholder="পাসওয়ার্ড">
-            <button onclick="sendOTP()">ওটিপি (OTP) পাঠান</button>
-            <div id="otp-section" style="display:none; margin-top:15px;">
-                <input type="text" id="otp-input" placeholder="৪ ডিজিট ওটিপি দিন">
-                <button onclick="verifyAndRegister()" style="background:#45bd62;">ভেরিফাই ও সাইন-আপ</button>
-            </div>
+            <button onclick="handleRegister()">সাইন-আপ করুন</button>
             <span class="switch-link" onclick="toggleAuth(true)">আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন</span>
         </div>
 
@@ -95,7 +91,7 @@
             <p style="margin-bottom:15px; color:#65676b;">লগইন করুন</p>
             <input type="text" id="login-phone" placeholder="মোবাইল নম্বর">
             <input type="password" id="login-pass" placeholder="পাসওয়ার্ড">
-            <button onclick="handleLogin()">লগইন</button>
+            <button onclick="handleLogin()">লগইন করুন</button>
             <span class="switch-link" onclick="toggleAuth(false)">অ্যাকাউন্ট নেই? সাইন-আপ করুন</span>
         </div>
     </div>
@@ -174,7 +170,6 @@
 
     <script>
         let currentUser = null;
-        let generatedOTP = null;
         let activeChatFriend = null;
         let selectedMediaData = { url: '', type: '' };
 
@@ -183,30 +178,17 @@
             document.getElementById('login-card').style.display = isLogin ? 'block' : 'none';
         }
 
-        function sendOTP() {
+        function handleRegister() {
             const name = document.getElementById('reg-name').value.trim();
             const phone = document.getElementById('reg-phone').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
 
-            if(!name || !phone || !pass) return alert("সকল তথ্য প্রদান করুন!");
-
-            generatedOTP = Math.floor(1000 + Math.random() * 9000);
-            alert("আপনার ভেরিফিকেশন ওটিপি (OTP) কোডটি হলো: " + generatedOTP);
-            document.getElementById('otp-section').style.display = 'block';
-        }
-
-        function verifyAndRegister() {
-            const inputOTP = document.getElementById('otp-input').value.trim();
-            if(inputOTP != generatedOTP) return alert("ভুল ওটিপি কোড!");
-
-            const name = document.getElementById('reg-name').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
-            const pass = document.getElementById('reg-pass').value.trim();
+            if(!name || !phone || !pass) return alert("সকল তথ্য পূরণ করুন!");
 
             let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            if(users.some(u => u.phone === phone)) return alert("এই নম্বরে অ্যাকাউন্ট আছে!");
+            if(users.some(u => u.phone === phone)) return alert("এই নম্বরে আগেই অ্যাকাউন্ট তৈরি করা হয়েছে!");
 
-            users.push({ name, phone, pass, friends: [] });
+            users.push({ name, phone, pass });
             localStorage.setItem('fb_users', JSON.stringify(users));
             alert("রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।");
             toggleAuth(true);
@@ -256,7 +238,7 @@
 
         function submitPost() {
             const text = document.getElementById('post-text').value.trim();
-            if(!text && !selectedMediaData.url) return alert("কিছু লিখুন বা ফাইল সিলেক্ট করুন!");
+            if(!text && !selectedMediaData.url) return alert("কিছু লিখুন বা ছবি/ভিডিও সিলেক্ট করুন!");
 
             let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
             posts.unshift({
@@ -284,7 +266,7 @@
                 html += `
                     <div class="post-card">
                         <div class="post-header">
-                            <div class="avatar">${p.author.charAt(0)}</div>
+                            <div class="avatar">${p.author.charAt(0).toUpperCase()}</div>
                             <div>
                                 <div class="post-author">${p.author}</div>
                                 <div class="post-time">এইমাত্র</div>
@@ -311,7 +293,7 @@
         function addStory() {
             alert("স্টোরি যোগ করা হয়েছে!");
             let list = document.getElementById('story-list');
-            list.innerHTML += `<div class="story-box" style="background:#1877f2;">${currentUser.name}</div>`;
+            list.innerHTML += `<div class="story-box">${currentUser.name}</div>`;
         }
 
         function loadFriends() {
@@ -343,7 +325,7 @@
                     `;
                 }
             });
-            document.getElementById('messenger-list').innerHTML = html;
+            document.getElementById('messenger-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">অন্য কোনো ইউজার নেই।</p>';
         }
 
         function openChat(phone, name) {
