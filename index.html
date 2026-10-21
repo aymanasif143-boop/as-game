@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS Game - Tap & Earn</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+        h1 {
+            color: #f1c40f;
+            margin-bottom: 10px;
+        }
+        .score-board {
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .coin-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #f39c12, #d35400);
+            border: 8px solid #f1c40f;
+            box-shadow: 0 0 25px rgba(241, 196, 15, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .coin-btn:active {
+            transform: scale(0.92);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AS Game</h1>
+    <div class="score-board">কয়েন: <span id="score">0</span></div>
+    
+    <div class="coin-btn" onclick="tapCoin()">🪙</div>
+
+    <script>
+        let count = 0;
+        function tapCoin() {
+            count++;
+            document.getElementById('score').innerText = count;
+        }
+    </script>
+
+</body>
+</html>
