@@ -1,763 +1,655 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AS Reebook</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#1877f2', // Classic Social Blue
-                            600: '#166fe5',
-                            700: '#0866ff',
-                            dark: '#18191a',
-                            card: '#242526',
-                            hover: '#3a3b3c'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS Reebook - Social & Messenger</title>
     <style>
-        /* Custom Scrollbar for sleek visual style */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-        }
-        /* Touch safety */
         body {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        /* Auth Screens */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1877f2, #3b5998);
+        }
+        .auth-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .auth-card h2 {
+            color: #1877f2;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+        .auth-card button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .auth-card button:hover {
+            background-color: #166fe5;
+        }
+        .switch-text {
+            font-size: 14px;
+            color: #1877f2;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Main App Screen */
+        #app-screen {
+            display: none;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            padding-bottom: 60px;
+        }
+        header {
+            background: #1877f2;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 {
+            font-size: 22px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-buttons button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .nav-buttons button.active {
+            background: white;
+            color: #1877f2;
+        }
+
+        /* Tab Contents */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Feed Section */
+        .create-post {
+            padding: 15px;
+            border-bottom: 8px solid #f0f2f5;
+        }
+        .create-post textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-upload-label {
+            cursor: pointer;
+            color: #1877f2;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .create-post button.post-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .post-card {
+            background: white;
+            border-bottom: 1px solid #e4e6eb;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #1877f2;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .post-author {
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #65676b;
+        }
+        .post-content {
+            font-size: 15px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .post-media {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        /* Messenger & Call UI */
+        .messenger-container, .users-list-container {
+            padding: 15px;
+        }
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            background: #f9f9f9;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+        .chat-box {
+            display: none;
+            flex-direction: column;
+            height: 75vh;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #e4e6eb;
+            border-radius: 8px 8px 0 0;
+        }
+        .call-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        .call-btn-group button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            word-break: break-word;
+        }
+        .message.sent {
+            background: #1877f2;
+            color: white;
+            align-self: flex-end;
+        }
+        .message.received {
+            background: #e4e6eb;
+            color: #333;
+            align-self: flex-start;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            background: #f0f2f5;
+            border-radius: 0 0 8px 8px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        .chat-input-area button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            margin-left: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Call Simulation Modal */
+        #call-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        .call-avatar {
+            width: 100px; height: 100px;
+            background: #1877f2;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .end-call-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 30px;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-[#18191a] text-gray-900 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
+<body>
 
-    <!-- TOP NAVIGATION BAR -->
-    <header class="fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#242526] border-b border-gray-200 dark:border-gray-700/60 z-50 flex items-center justify-between px-4 shadow-sm">
-        <!-- Left: Logo & Search -->
-        <div class="flex items-center gap-2 md:gap-4">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('feed')">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-md">
-                    AS
+    <!-- Register Screen -->
+    <div id="register-screen" class="auth-container">
+        <div class="auth-card">
+            <h2>AS Reebook</h2>
+            <p style="margin-bottom: 15px; color: #65676b; font-size: 14px;">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+            <input type="text" id="reg-name" placeholder="আপনার পূর্ণ নাম...">
+            <input type="text" id="reg-username" placeholder="ইউজারনেম (যেমন: asif007)...">
+            <input type="text" id="reg-phone" placeholder="মোবাইল নম্বর...">
+            <input type="password" id="reg-pass" placeholder="পাসওয়ার্ড...">
+            <button onclick="handleRegister()">রেজিস্ট্রেশন করুন</button>
+            <div class="switch-text" onclick="showLogin()">আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন</div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="auth-container" style="display: none;">
+        <div class="auth-card">
+            <h2>AS Reebook</h2>
+            <p style="margin-bottom: 15px; color: #65676b; font-size: 14px;">নম্বর ও পাসওয়ার্ড দিয়ে লগইন করুন</p>
+            <input type="text" id="login-phone" placeholder="মোবাইল নম্বর...">
+            <input type="password" id="login-pass" placeholder="পাসওয়ার্ড...">
+            <button onclick="handleLogin()">লগইন করুন</button>
+            <div class="switch-text" onclick="showRegister()">অ্যাকাউন্ট নেই? রেজিস্ট্রেশন করুন</div>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen">
+        <header>
+            <h1>AS Reebook</h1>
+            <div class="nav-buttons">
+                <button id="nav-feed" class="active" onclick="switchTab('feed')">ফিড</button>
+                <button id="nav-chat" onclick="switchTab('chat')">মেসেঞ্জার</button>
+                <button onclick="handleLogout()" style="background:#dc3545;">লগআউট</button>
+            </div>
+        </header>
+
+        <!-- Feed Tab -->
+        <div id="tab-feed" class="tab-content active">
+            <div class="create-post">
+                <textarea id="post-text" rows="3" placeholder="আজ মনে কি চলছে? ছবি বা ভিডিওসহ শেয়ার করুন..."></textarea>
+                <div class="post-actions">
+                    <label class="file-upload-label">
+                        📁 ছবি/ভিডিও জুড়ুন
+                        <input type="file" id="media-file" accept="image/*,video/*" style="display: none;" onchange="previewMedia()">
+                    </label>
+                    <button class="post-btn" onclick="createPost()">পোস্ট করুন</button>
                 </div>
-                <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent hidden sm:inline">
-                    AS Reebook
-                </span>
+                <div id="file-name-display" style="font-size: 12px; color: #65676b; margin-top: 5px;"></div>
             </div>
-            
-            <div class="relative flex items-center">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search AS Reebook..." 
-                    class="bg-gray-100 dark:bg-[#3a3b3c] pl-9 pr-4 py-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36 sm:w-60 transition-all">
-            </div>
+            <div class="feed" id="feed-container"></div>
         </div>
 
-        <!-- Center: Navigation Tabs (Desktop) -->
-        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 h-full">
-            <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-blue-600 text-blue-600 transition">
-                <i class="fa-solid fa-house text-xl"></i>
-            </button>
-            <button onclick="switchTab('watch')" id="nav-watch" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
-                <i class="fa-solid fa-tv text-xl"></i>
-            </button>
-            <button onclick="switchTab('friends')" id="nav-friends" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
-                <i class="fa-solid fa-user-group text-xl"></i>
-            </button>
-            <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
-                <i class="fa-solid fa-circle-user text-xl"></i>
-            </button>
-        </nav>
-
-        <!-- Right: Actions & Profile -->
-        <div class="flex items-center gap-2">
-            <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
-                <i id="darkModeIcon" class="fa-solid fa-moon"></i>
-            </button>
-            
-            <button onclick="switchTab('notifications')" class="relative w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
-                <i class="fa-solid fa-bell"></i>
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#242526]">3</span>
-            </button>
-
-            <button onclick="toggleMessages()" class="relative w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
-                <i class="fa-solid fa-comment-dots"></i>
-                <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#242526]">2</span>
-            </button>
-
-            <!-- User Avatar button -->
-            <div onclick="switchTab('profile')" class="flex items-center gap-2 cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-[#3a3b3c] transition">
-                <img id="headerAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-blue-500">
-            </div>
-        </div>
-    </header>
-
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white dark:bg-[#242526] border-t border-gray-200 dark:border-gray-700/60 z-50 flex items-center justify-around px-2">
-        <button onclick="switchTab('feed')" id="m-nav-feed" class="flex flex-col items-center justify-center text-blue-600">
-            <i class="fa-solid fa-house text-lg"></i>
-            <span class="text-[10px] mt-0.5">Home</span>
-        </button>
-        <button onclick="switchTab('watch')" id="m-nav-watch" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-            <i class="fa-solid fa-tv text-lg"></i>
-            <span class="text-[10px] mt-0.5">Watch</span>
-        </button>
-        <button onclick="switchTab('friends')" id="m-nav-friends" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-            <i class="fa-solid fa-user-group text-lg"></i>
-            <span class="text-[10px] mt-0.5">Friends</span>
-        </button>
-        <button onclick="switchTab('notifications')" id="m-nav-notifications" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-            <i class="fa-solid fa-bell text-lg"></i>
-            <span class="text-[10px] mt-0.5">Alerts</span>
-        </button>
-        <button onclick="switchTab('profile')" id="m-nav-profile" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-            <i class="fa-solid fa-circle-user text-lg"></i>
-            <span class="text-[10px] mt-0.5">Profile</span>
-        </button>
-    </nav>
-
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="pt-16 pb-20 md:pb-10 max-w-7xl mx-auto px-2 sm:px-4">
-        
-        <!-- FEED TAB -->
-        <div id="tab-feed" class="tab-content grid grid-cols-1 lg:grid-cols-4 gap-4">
-            
-            <!-- Left Sidebar -->
-            <aside class="hidden lg:block lg:col-span-1 space-y-2 sticky top-20 h-fit">
-                <div onclick="switchTab('profile')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
-                    <span class="font-semibold text-sm">AS Reebook User</span>
-                </div>
-                <div onclick="switchTab('friends')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
-                    <i class="fa-solid fa-user-group text-xl text-blue-500 w-8"></i>
-                    <span class="font-semibold text-sm">Friends</span>
-                </div>
-                <div onclick="switchTab('watch')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
-                    <i class="fa-solid fa-circle-play text-xl text-red-500 w-8"></i>
-                    <span class="font-semibold text-sm">Watch Videos</span>
-                </div>
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
-                    <i class="fa-solid fa-[#1877f2] fa-bookmark text-xl text-purple-500 w-8"></i>
-                    <span class="font-semibold text-sm">Saved Posts</span>
-                </div>
-                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
-                    <i class="fa-solid fa-gamepad text-xl text-green-500 w-8"></i>
-                    <span class="font-semibold text-sm">AS Gaming Hub</span>
-                </div>
-                <hr class="border-gray-200 dark:border-gray-700/60 my-2">
-                <p class="text-xs text-gray-500 px-3">AS Reebook Community &copy; 2026. All rights reserved.</p>
-            </aside>
-
-            <!-- Middle Feed -->
-            <div class="lg:col-span-2 space-y-4 max-w-2xl mx-auto w-full">
-                
-                <!-- Stories Carousel -->
-                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none pt-1">
-                    <!-- Add Story -->
-                    <div class="flex-shrink-0 w-28 h-44 rounded-xl bg-white dark:bg-[#242526] relative overflow-hidden shadow cursor-pointer group border border-gray-200 dark:border-gray-700">
-                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-2 border-white dark:border-[#242526]">
-                            <i class="fa-solid fa-plus text-sm"></i>
-                        </div>
-                        <div class="absolute bottom-1 w-full text-center text-[11px] font-semibold text-gray-800 dark:text-gray-200">
-                            Create Story
-                        </div>
-                    </div>
-
-                    <!-- Story Items -->
-                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
-                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
-                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Sarah Jenkins</span>
-                    </div>
-
-                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
-                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
-                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Alex Rivera</span>
-                    </div>
-
-                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
-                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Elena Rostova</span>
-                    </div>
-                </div>
-
-                <!-- Create Post Box -->
-                <div class="bg-white dark:bg-[#242526] rounded-xl p-4 shadow border border-gray-200 dark:border-gray-700/60">
-                    <div class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-700/60">
-                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
-                        <button onclick="openCreatePostModal()" class="w-full text-left bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] text-gray-500 dark:text-gray-300 px-4 py-2.5 rounded-full text-sm transition">
-                            What's on your mind, AS Reebook User?
-                        </button>
-                    </div>
-                    <div class="flex justify-between items-center pt-3 px-2">
-                        <button onclick="openCreatePostModal('photo')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
-                            <i class="fa-solid fa-images text-green-500 text-lg"></i>
-                            <span class="font-medium">Photo</span>
-                        </button>
-                        <button onclick="openCreatePostModal('video')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
-                            <i class="fa-solid fa-video text-red-500 text-lg"></i>
-                            <span class="font-medium">Video</span>
-                        </button>
-                        <button onclick="openCreatePostModal('feeling')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
-                            <i class="fa-solid fa-face-smile text-yellow-500 text-lg"></i>
-                            <span class="font-medium">Feeling</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Feed Posts List -->
-                <div id="postsContainer" class="space-y-4">
-                    <!-- Posts will be populated dynamically via JavaScript -->
-                </div>
-
+        <!-- Messenger Tab -->
+        <div id="tab-chat" class="tab-content">
+            <div id="users-list-view" class="users-list-container">
+                <h3 style="margin-bottom: 15px; color: #1877f2;">অন্যান্য ইউজারদের সাথে চ্যাট করুন</h3>
+                <div id="other-users-container"></div>
             </div>
 
-            <!-- Right Sidebar: Suggested Friends & Trending -->
-            <aside class="hidden lg:block lg:col-span-1 space-y-4 sticky top-20 h-fit">
-                <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
-                    <h3 class="font-bold text-gray-500 dark:text-gray-400 text-sm mb-3">SUGGESTED FRIENDS</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" class="w-9 h-9 rounded-full object-cover">
-                                <div>
-                                    <p class="font-semibold text-xs">Rahim Ahmed</p>
-                                    <p class="text-[10px] text-gray-500">4 mutual friends</p>
-                                </div>
-                            </div>
-                            <button onclick="this.innerText='Added'; this.disabled=true;" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add</button>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80" class="w-9 h-9 rounded-full object-cover">
-                                <div>
-                                    <p class="font-semibold text-xs">Nusrat Jahan</p>
-                                    <p class="text-[10px] text-gray-500">8 mutual friends</p>
-                                </div>
-                            </div>
-                            <button onclick="this.innerText='Added'; this.disabled=true;" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
-                    <h3 class="font-bold text-gray-500 dark:text-gray-400 text-sm mb-3">TRENDING ON REEBOOK</h3>
-                    <div class="space-y-2 text-sm">
-                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#ASGamingTournament</p>
-                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#ASReebookLaunch</p>
-                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#TechUpdate2026</p>
-                    </div>
-                </div>
-            </aside>
-        </div>
-
-        <!-- WATCH TAB -->
-        <div id="tab-watch" class="tab-content hidden max-w-2xl mx-auto space-y-4">
-            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60 flex items-center justify-between">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-circle-play text-red-500"></i> AS Reebook Watch
-                </h2>
-                <span class="text-xs bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full font-semibold">Live Streams & Clips</span>
-            </div>
-            <div id="watchContainer" class="space-y-4">
-                <!-- Video Posts loaded here -->
-            </div>
-        </div>
-
-        <!-- FRIENDS TAB -->
-        <div id="tab-friends" class="tab-content hidden max-w-4xl mx-auto space-y-4">
-            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
-                <h2 class="text-xl font-bold mb-4">Friends & Connections</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    <!-- Friend Card -->
-                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                        <h4 class="font-bold text-sm mt-2">Alex Rivera</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">12 Mutuals</p>
-                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                        <h4 class="font-bold text-sm mt-2">Sarah Jenkins</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">24 Mutuals</p>
-                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                        <h4 class="font-bold text-sm mt-2">Tanvir Hassan</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">5 Mutuals</p>
-                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
-                        <h4 class="font-bold text-sm mt-2">Elena Rostova</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">19 Mutuals</p>
-                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- NOTIFICATIONS TAB -->
-        <div id="tab-notifications" class="tab-content hidden max-w-2xl mx-auto space-y-3">
-            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
-                <h2 class="text-xl font-bold mb-3">Notifications</h2>
-                <div class="space-y-2">
-                    <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3a3b3c] cursor-pointer">
-                        <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center">
-                            <i class="fa-solid fa-thumbs-up"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm"><strong>Sarah Jenkins</strong> liked your post in AS Gaming group.</p>
-                            <span class="text-xs text-blue-500 font-medium">10 mins ago</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3a3b3c] cursor-pointer">
-                        <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center">
-                            <i class="fa-solid fa-comment"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm"><strong>Alex Rivera</strong> commented on your video update.</p>
-                            <span class="text-xs text-blue-500 font-medium">1 hour ago</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- USER PROFILE TAB -->
-        <div id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-4">
-            <!-- Cover & Avatar Section -->
-            <div class="bg-white dark:bg-[#242526] rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700/60">
-                <div class="h-48 sm:h-64 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
-                    <button class="absolute bottom-3 right-3 bg-white/80 dark:bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                        <i class="fa-solid fa-camera"></i> Edit Cover
-                    </button>
-                </div>
-                <div class="px-6 pb-6 relative">
-                    <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 sm:-mt-20 gap-4 mb-4">
-                        <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
-                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80" class="w-32 h-32 rounded-full border-4 border-white dark:border-[#242526] object-cover shadow-lg">
-                            <div>
-                                <h1 class="text-2xl font-bold">AS Reebook User</h1>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">@as_reebook_official</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openCreatePostModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
-                                <i class="fa-solid fa-plus mr-1"></i> Add Post
-                            </button>
-                            <button class="bg-gray-200 dark:bg-[#3a3b3c] hover:bg-gray-300 dark:hover:bg-[#4e4f50] font-semibold px-4 py-2 rounded-lg text-sm transition">
-                                <i class="fa-solid fa-pen mr-1"></i> Edit Profile
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <hr class="border-gray-200 dark:border-gray-700 my-4">
-
-                    <!-- Profile Stats -->
-                    <div class="flex justify-around sm:justify-start sm:gap-12 text-center">
-                        <div>
-                            <span id="profilePostCount" class="font-bold text-lg block">0</span>
-                            <span class="text-xs text-gray-500">Posts</span>
-                        </div>
-                        <div>
-                            <span class="font-bold text-lg block">1.2k</span>
-                            <span class="text-xs text-gray-500">Friends</span>
-                        </div>
-                        <div>
-                            <span id="profileLikesCount" class="font-bold text-lg block">0</span>
-                            <span class="text-xs text-gray-500">Total Likes</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Posts Container -->
-            <div id="profilePostsContainer" class="space-y-4 max-w-2xl mx-auto">
-                <!-- User posts dynamically added here -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- CREATE POST MODAL -->
-    <div id="createPostModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-[#242526] w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-bold text-lg">Create Post</h3>
-                <button onclick="closeCreatePostModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            
-            <div class="p-4 space-y-4">
-                <div class="flex items-center gap-3">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
+            <div id="chat-box-view" class="chat-box">
+                <div class="chat-header">
                     <div>
-                        <p class="font-semibold text-sm">AS Reebook User</p>
-                        <span class="text-xs bg-gray-200 dark:bg-[#3a3b3c] px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-300">
-                            <i class="fa-solid fa-earth-americas mr-1"></i> Public
-                        </span>
+                        <button onclick="backToUserList()" style="border:none; background:none; font-weight:bold; cursor:pointer; color:#1877f2; margin-right:10px;">← ব্যাক</button>
+                        <span id="chat-target-name" style="font-weight: bold;"></span>
+                    </div>
+                    <div class="call-btn-group">
+                        <button onclick="startCall('audio')">📞 অডিও কল</button>
+                        <button onclick="startCall('video')">📹 ভিডিও কল</button>
                     </div>
                 </div>
-
-                <textarea id="postText" rows="3" placeholder="What's on your mind?" 
-                    class="w-full bg-transparent border-none focus:outline-none text-base resize-none text-gray-800 dark:text-gray-100"></textarea>
-
-                <!-- Media Preview / Input Container -->
-                <div id="mediaInputContainer" class="space-y-2">
-                    <input type="text" id="postImageURL" placeholder="Paste Image URL (e.g. Unsplash URL)" 
-                        class="w-full bg-gray-100 dark:bg-[#3a3b3c] px-3 py-2 rounded-lg text-sm focus:outline-none border border-transparent focus:border-blue-500">
-                    <input type="text" id="postVideoURL" placeholder="Or Paste Video URL (MP4 / YouTube embed)" 
-                        class="w-full bg-gray-100 dark:bg-[#3a3b3c] px-3 py-2 rounded-lg text-sm focus:outline-none border border-transparent focus:border-blue-500">
+                <div class="chat-messages" id="chat-messages-container"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input-text" placeholder="মেসেজ লিখুন...">
+                    <button onclick="sendChatMessage()">সেন্ড</button>
                 </div>
-
-                <button onclick="submitNewPost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition">
-                    Post to AS Reebook
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- DIRECT MESSAGES DRAWER OVERLAY -->
-    <div id="messagesOverlay" class="fixed bottom-16 right-4 w-80 sm:w-96 bg-white dark:bg-[#242526] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/80 z-40 hidden flex flex-col h-96">
-        <div class="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <h3 class="font-bold text-sm">Direct Messages</h3>
-            <button onclick="toggleMessages()" class="text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="p-3 flex-1 overflow-y-auto space-y-3">
-            <div class="flex gap-2">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="w-8 h-8 rounded-full">
-                <div class="bg-gray-100 dark:bg-[#3a3b3c] p-2.5 rounded-2xl text-xs max-w-[80%]">
-                    Hey! Welcome to AS Reebook Social Platform! 🚀
-                </div>
-            </div>
-            <div class="flex gap-2 justify-end">
-                <div class="bg-blue-600 text-white p-2.5 rounded-2xl text-xs max-w-[80%]">
-                    Thanks! Looking great!
-                </div>
-            </div>
-        </div>
-        <div class="p-2 border-t border-gray-200 dark:border-gray-700 flex gap-2">
-            <input type="text" placeholder="Type a message..." class="flex-1 bg-gray-100 dark:bg-[#3a3b3c] px-3 py-1.5 rounded-full text-xs focus:outline-none">
-            <button class="text-blue-600 px-2"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
+    <!-- Call Simulation Modal -->
+    <div id="call-modal">
+        <div class="call-avatar" id="call-modal-avatar">A</div>
+        <h2 id="call-status-text">কল হচ্ছে...</h2>
+        <p id="call-target-display" style="margin-top: 10px; color: #ccc;"></p>
+        <button class="end-call-btn" onclick="endCall()">কল কেটে দিন</button>
     </div>
 
-    <!-- APPLICATION JAVASCRIPT -->
     <script>
-        // INITIAL DUMMY DATA FOR AS REEBOOK
-        const initialPosts = [
-            {
-                id: 'post-1',
-                author: 'AS Gaming Official',
-                avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=150&q=80',
-                time: '2 hours ago',
-                content: 'Welcome to AS Reebook! Experience our new social community hub. Post updates, connect with friends, and watch gaming highlights! 🎮🔥',
-                image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-                video: '',
-                likes: 42,
-                liked: false,
-                comments: [
-                    { name: 'Sarah J.', text: 'Awesome platform UI!' },
-                    { name: 'Alex R.', text: 'Love the blue theme.' }
-                ]
-            },
-            {
-                id: 'post-2',
-                author: 'Elena Rostova',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-                time: '5 hours ago',
-                content: 'Check out this awesome gaming setup video clip! 🎬',
-                image: '',
-                video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                likes: 18,
-                liked: false,
-                comments: []
-            }
-        ];
+        let currentUser = null;
+        let activeChatUser = null;
 
-        // LOCAL STORAGE STATE
-        let posts = JSON.parse(localStorage.getItem('as_reebook_posts')) || initialPosts;
-
-        // TAB SWITCHING LOGIC
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
-            // Reset navigation active styles
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('border-blue-600', 'text-blue-600');
-                btn.classList.add('border-transparent', 'text-gray-500');
-            });
-
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            if (activeNav) {
-                activeNav.classList.add('border-blue-600', 'text-blue-600');
-                activeNav.classList.remove('border-transparent', 'text-gray-500');
-            }
-
-            if (tabId === 'feed' || tabId === 'profile') {
-                renderPosts();
-            } else if (tabId === 'watch') {
-                renderWatchFeed();
-            }
+        function showLogin() {
+            document.getElementById("register-screen").style.display = "none";
+            document.getElementById("login-screen").style.display = "flex";
         }
 
-        // RENDER POSTS TO DOM
-        function renderPosts() {
-            const container = document.getElementById('postsContainer');
-            const profileContainer = document.getElementById('profilePostsContainer');
-            
-            container.innerHTML = '';
-            profileContainer.innerHTML = '';
-
-            let userLikesTotal = 0;
-            let userPostsCount = 0;
-
-            posts.forEach(post => {
-                if (post.author === 'AS Reebook User') {
-                    userPostsCount++;
-                    userLikesTotal += post.likes;
-                }
-
-                const postHTML = createPostCardHTML(post);
-                container.insertAdjacentHTML('beforeend', postHTML);
-
-                if (post.author === 'AS Reebook User') {
-                    profileContainer.insertAdjacentHTML('beforeend', postHTML);
-                }
-            });
-
-            document.getElementById('profilePostCount').innerText = userPostsCount;
-            document.getElementById('profileLikesCount').innerText = userLikesTotal;
+        function showRegister() {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("register-screen").style.display = "flex";
         }
 
-        // RENDER WATCH FEED
-        function renderWatchFeed() {
-            const container = document.getElementById('watchContainer');
-            container.innerHTML = '';
+        function handleRegister() {
+            const name = document.getElementById("reg-name").value.trim();
+            const username = document.getElementById("reg-username").value.trim();
+            const phone = document.getElementById("reg-phone").value.trim();
+            const pass = document.getElementById("reg-pass").value.trim();
 
-            const videoPosts = posts.filter(p => p.video && p.video.trim() !== '');
-
-            if (videoPosts.length === 0) {
-                container.innerHTML = `<div class="p-8 text-center text-gray-500">No videos available yet. Create one!</div>`;
+            if(!name || !username || !phone || !pass) {
+                alert("সবগুলো ঘর পূরণ করুন!");
                 return;
             }
 
-            videoPosts.forEach(post => {
-                container.insertAdjacentHTML('beforeend', createPostCardHTML(post));
-            });
+            let users = JSON.parse(localStorage.getItem("as_reebook_users") || "[]");
+            if(users.some(u => u.phone === phone)) {
+                alert("এই নম্বর দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা আছে!");
+                return;
+            }
+            if(users.some(u => u.username === username)) {
+                alert("এই ইউজারনেমটি অন্য কেউ ব্যবহার করছে, অন্যটি দিন!");
+                return;
+            }
+
+            users.push({ name, username, phone, pass });
+            localStorage.setItem("as_reebook_users", JSON.stringify(users));
+            alert("রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।");
+            showLogin();
         }
 
-        // CREATE SINGLE POST HTML CARD
-        function createPostCardHTML(post) {
-            const commentsList = post.comments.map(c => `
-                <div class="flex gap-2 text-xs bg-gray-100 dark:bg-[#3a3b3c] p-2 rounded-xl">
-                    <span class="font-bold text-gray-800 dark:text-gray-200">${c.name}:</span>
-                    <span class="text-gray-600 dark:text-gray-300">${c.text}</span>
-                </div>
-            `).join('');
+        function handleLogin() {
+            const phone = document.getElementById("login-phone").value.trim();
+            const pass = document.getElementById("login-pass").value.trim();
 
-            return `
-                <div class="bg-white dark:bg-[#242526] rounded-xl shadow border border-gray-200 dark:border-gray-700/60 overflow-hidden">
-                    <!-- Post Header -->
-                    <div class="p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img src="${post.avatar}" class="w-10 h-10 rounded-full object-cover">
+            let users = JSON.parse(localStorage.getItem("as_reebook_users") || "[]");
+            let validUser = users.find(u => u.phone === phone && u.pass === pass);
+
+            if(!validUser) {
+                alert("নম্বর অথবা পাসওয়ার্ড ভুল হয়েছে!");
+                return;
+            }
+
+            currentUser = validUser;
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("app-screen").style.display = "block";
+            loadPosts();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById("app-screen").style.display = "none";
+            document.getElementById("login-screen").style.display = "flex";
+        }
+
+        function switchTab(tab) {
+            document.getElementById("tab-feed").classList.remove("active");
+            document.getElementById("tab-chat").classList.remove("active");
+            document.getElementById("nav-feed").classList.remove("active");
+            document.getElementById("nav-chat").classList.remove("active");
+
+            if(tab === 'feed') {
+                document.getElementById("tab-feed").classList.add("active");
+                document.getElementById("nav-feed").classList.add("active");
+                loadPosts();
+            } else {
+                document.getElementById("tab-chat").classList.add("active");
+                document.getElementById("nav-chat").classList.add("active");
+                loadUsersList();
+            }
+        }
+
+        let selectedMediaUrl = "";
+        let selectedMediaType = "";
+
+        function previewMedia() {
+            const fileInput = document.getElementById("media-file");
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                document.getElementById("file-name-display").innerText = "সিলেক্ট করা ফাইল: " + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedMediaUrl = e.target.result;
+                    selectedMediaType = file.type.startsWith('video') ? 'video' : 'image';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function createPost() {
+            const text = document.getElementById("post-text").value.trim();
+            if(!text && !selectedMediaUrl) {
+                alert("কিছু লিখুন অথবা ছবি/ভিডিও সিলেক্ট করুন!");
+                return;
+            }
+
+            const posts = JSON.parse(localStorage.getItem("as_reebook_posts") || "[]");
+            posts.unshift({
+                author: currentUser.name,
+                username: currentUser.username,
+                text: text,
+                mediaUrl: selectedMediaUrl,
+                mediaType: selectedMediaType,
+                time: "এইমাত্র"
+            });
+            localStorage.setItem("as_reebook_posts", JSON.stringify(posts));
+
+            document.getElementById("post-text").value = "";
+            document.getElementById("media-file").value = "";
+            document.getElementById("file-name-display").innerText = "";
+            selectedMediaUrl = "";
+            selectedMediaType = "";
+            loadPosts();
+        }
+
+        function loadPosts() {
+            const feedContainer = document.getElementById("feed-container");
+            const posts = JSON.parse(localStorage.getItem("as_reebook_posts") || "[]");
+            
+            if(posts.length === 0) {
+                feedContainer.innerHTML = '<p style="text-align:center; color:#65676b; margin-top:20px;">এখনো কোনো পোস্ট নেই।</p>';
+                return;
+            }
+
+            let html = "";
+            posts.forEach(post => {
+                let mediaHtml = post.mediaUrl ? (post.mediaType === 'video' ? `<video src="${post.mediaUrl}" controls class="post-media"></video>` : `<img src="${post.mediaUrl}" class="post-media">`) : "";
+                html += `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="avatar">${post.author.charAt(0).toUpperCase()}</div>
                             <div>
-                                <h4 class="font-bold text-sm text-gray-900 dark:text-gray-100">${post.author}</h4>
-                                <span class="text-xs text-gray-500">${post.time} &bull; <i class="fa-solid fa-earth-americas"></i></span>
+                                <div class="post-author">${post.author} <span style="font-size:12px; color:#65676b; font-weight:normal;">@${post.username}</span></div>
+                                <div class="post-time">${post.time}</div>
                             </div>
                         </div>
-                        <button class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-ellipsis"></i></button>
+                        <div class="post-content">${post.text}</div>
+                        ${mediaHtml}
                     </div>
+                `;
+            });
+            feedContainer.innerHTML = html;
+        }
 
-                    <!-- Content -->
-                    <p class="px-4 pb-3 text-sm text-gray-800 dark:text-gray-200 leading-relaxed">${post.content}</p>
-
-                    <!-- Media Render -->
-                    ${post.image ? `<img src="${post.image}" class="w-full max-h-96 object-cover">` : ''}
-                    ${post.video ? `
-                        <div class="relative bg-black">
-                            <video controls class="w-full max-h-96">
-                                <source src="${post.video}" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
+        function loadUsersList() {
+            const users = JSON.parse(localStorage.getItem("as_reebook_users") || "[]");
+            const container = document.getElementById("other-users-container");
+            
+            let html = "";
+            users.forEach(u => {
+                if(u.username !== currentUser.username) {
+                    html += `
+                        <div class="user-list-item">
+                            <div>
+                                <strong>${u.name}</strong>
+                                <div style="font-size:12px; color:#65676b;">@${u.username}</div>
+                            </div>
+                            <button onclick="openChat('${u.username}', '${u.name}')" style="background:#1877f2; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">মেসেজ দিন</button>
                         </div>
-                    ` : ''}
-
-                    <!-- Post Stats -->
-                    <div class="px-4 py-2 flex justify-between text-xs text-gray-500 border-b border-gray-100 dark:border-gray-700/60">
-                        <span><i class="fa-solid fa-thumbs-up text-blue-500"></i> ${post.likes} Likes</span>
-                        <span>${post.comments.length} Comments</span>
-                    </div>
-
-                    <!-- Post Actions -->
-                    <div class="flex justify-around py-1 border-b border-gray-100 dark:border-gray-700/60 text-sm">
-                        <button onclick="toggleLike('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] font-semibold ${post.liked ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'} transition">
-                            <i class="fa-solid fa-thumbs-up"></i> Like
-                        </button>
-                        <button onclick="focusCommentInput('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] text-gray-600 dark:text-gray-300 font-semibold transition">
-                            <i class="fa-solid fa-comment"></i> Comment
-                        </button>
-                        <button onclick="sharePost('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] text-gray-600 dark:text-gray-300 font-semibold transition">
-                            <i class="fa-solid fa-share"></i> Share
-                        </button>
-                    </div>
-
-                    <!-- Comments Section -->
-                    <div class="p-3 bg-gray-50 dark:bg-[#2a2b2c] space-y-2">
-                        <div id="comments-list-${post.id}" class="space-y-1.5">
-                            ${commentsList}
-                        </div>
-                        <div class="flex items-center gap-2 pt-2">
-                            <input id="input-comment-${post.id}" type="text" placeholder="Write a comment..." 
-                                class="flex-1 bg-white dark:bg-[#3a3b3c] text-xs px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 focus:outline-none">
-                            <button onclick="addComment('${post.id}')" class="text-blue-600 text-sm font-bold px-2">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+                    `;
+                }
+            });
+            container.innerHTML = html || '<p style="text-align:center; color:#65676b;">অন্য কোনো ইউজার নেই।</p>';
+            document.getElementById("users-list-view").style.display = "block";
+            document.getElementById("chat-box-view").style.display = "none";
         }
 
-        // CREATE NEW POST MODAL CONTROLS
-        function openCreatePostModal(type = 'text') {
-            document.getElementById('createPostModal').classList.remove('hidden');
+        function openChat(username, name) {
+            activeChatUser = { username, name };
+            document.getElementById("chat-target-name").innerText = name;
+            document.getElementById("users-list-view").style.display = "none";
+            document.getElementById("chat-box-view").style.display = "flex";
+            loadChatMessages();
         }
 
-        function closeCreatePostModal() {
-            document.getElementById('createPostModal').classList.add('hidden');
-            document.getElementById('postText').value = '';
-            document.getElementById('postImageURL').value = '';
-            document.getElementById('postVideoURL').value = '';
+        function backToUserList() {
+            activeChatUser = null;
+            document.getElementById("chat-box-view").style.display = "none";
+            document.getElementById("users-list-view").style.display = "block";
         }
 
-        function submitNewPost() {
-            const text = document.getElementById('postText').value.trim();
-            const image = document.getElementById('postImageURL').value.trim();
-            const video = document.getElementById('postVideoURL').value.trim();
+        function sendChatMessage() {
+            const text = document.getElementById("chat-input-text").value.trim();
+            if(!text) return;
 
-            if (!text && !image && !video) {
-                alert('Please add text or media to post!');
-                return;
-            }
+            const chats = JSON.parse(localStorage.getItem("as_reebook_chats") || "[]");
+            chats.push({
+                sender: currentUser.username,
+                receiver: activeChatUser.username,
+                text: text
+            });
+            localStorage.setItem("as_reebook_chats", JSON.stringify(chats));
 
-            const newPost = {
-                id: 'post-' + Date.now(),
-                author: 'AS Reebook User',
-                avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-                time: 'Just now',
-                content: text,
-                image: image,
-                video: video,
-                likes: 0,
-                liked: false,
-                comments: []
-            };
-
-            posts.unshift(newPost);
-            savePostsState();
-            closeCreatePostModal();
-            renderPosts();
+            document.getElementById("chat-input-text").value = "";
+            loadChatMessages();
         }
 
-        // POST INTERACTION FUNCTIONS
-        function toggleLike(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                post.liked = !post.liked;
-                post.likes += post.liked ? 1 : -1;
-                savePostsState();
-                renderPosts();
-            }
+        function loadChatMessages() {
+            const chats = JSON.parse(localStorage.getItem("as_reebook_chats") || "[]");
+            const container = document.getElementById("chat-messages-container");
+            
+            let html = "";
+            chats.forEach(c => {
+                if((c.sender === currentUser.username && c.receiver === activeChatUser.username) || 
+                   (c.sender === activeChatUser.username && c.receiver === currentUser.username)) {
+                    let className = c.sender === currentUser.username ? "sent" : "received";
+                    html += `<div class="message ${className}">${c.text}</div>`;
+                }
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
         }
 
-        function addComment(postId) {
-            const input = document.getElementById(`input-comment-${postId}`);
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                post.comments.push({ name: 'AS Reebook User', text: text });
-                savePostsState();
-                renderPosts();
-            }
+        function startCall(type) {
+            const modal = document.getElementById("call-modal");
+            document.getElementById("call-modal-avatar").innerText = activeChatUser.name.charAt(0);
+            document.getElementById("call-status-text").innerText = type === 'video' ? "ভিডিও কল হচ্ছে..." : "অডিও কল হচ্ছে...";
+            document.getElementById("call-target-display").innerText = activeChatUser.name;
+            modal.style.display = "flex";
         }
 
-        function focusCommentInput(postId) {
-            const input = document.getElementById(`input-comment-${postId}`);
-            if (input) input.focus();
+        function endCall() {
+            document.getElementById("call-modal").style.display = "none";
         }
-
-        function sharePost(postId) {
-            alert('Post shared to your AS Reebook timeline!');
-        }
-
-        function savePostsState() {
-            localStorage.setItem('as_reebook_posts', JSON.stringify(posts));
-        }
-
-        // DARK MODE TOGGLE
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const icon = document.getElementById('darkModeIcon');
-            if (document.documentElement.classList.contains('dark')) {
-                icon.className = 'fa-solid fa-sun text-yellow-400';
-            } else {
-                icon.className = 'fa-solid fa-moon';
-            }
-        }
-
-        // MESSAGES TOGGLE
-        function toggleMessages() {
-            const overlay = document.getElementById('messagesOverlay');
-            overlay.classList.toggle('hidden');
-        }
-
-        // INITIALIZE APP ON LOAD
-        window.onload = function() {
-            renderPosts();
-        };
     </script>
 </body>
 </html>
-```
