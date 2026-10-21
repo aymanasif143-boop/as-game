@@ -1,193 +1,213 @@
+
+এই যে সম্পূর্ণ কোডটি প্রস্তুত করা হয়েছে। নিচে HTML কোডটি দেওয়া হলো, এটি আপনার GitHub-এর index.html ফাইলে কপি-পেস্ট করে চেক করে দেখতে পারেন:
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AS Game - 3D Bus Simulator</title>
+    <title>AS Bus Simulator Pro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #050b14; font-family: sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         
-        #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
-        .hud-card { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); padding: 10px 16px; border-radius: 12px; border: 1px solid #00f0ff; color: #fff; font-size: 16px; font-weight: bold; }
-        .hud-card span { color: #ffd700; font-size: 18px; }
+        /* Dashboard HUD */
+        #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
+        .hud-card { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); padding: 10px 18px; border-radius: 12px; border: 1px solid #00f0ff; color: #fff; font-size: 16px; font-weight: bold; }
         
-        #speedo { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 25px; border-radius: 25px; border: 2px solid #00f0ff; color: #fff; text-align: center; pointer-events: none; z-index: 10; }
-        #speed-val { font-size: 28px; font-weight: bold; color: #00f0ff; }
+        /* Speedometer */
+        #speedo { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); padding: 10px 30px; border-radius: 30px; border: 2px solid #00f0ff; color: #fff; text-align: center; pointer-events: none; z-index: 10; }
+        #speed-val { font-size: 32px; font-weight: 900; color: #00f0ff; text-shadow: 0 0 10px #00f0ff; }
         
-        .control-btn { position: absolute; z-index: 10; background: rgba(255, 255, 255, 0.25); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 24px; touch-action: manipulation; }
+        /* Controls */
+        .control-btn { position: absolute; z-index: 10; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 22px; touch-action: manipulation; }
         .control-btn:active { background: rgba(0, 240, 255, 0.6); }
-        #btn-left { bottom: 30px; left: 20px; width: 65px; height: 65px; }
-        #btn-right { bottom: 30px; left: 95px; width: 65px; height: 65px; }
-        #btn-gas { bottom: 105px; right: 20px; width: 70px; height: 70px; background: rgba(0, 230, 118, 0.4); border-color: #00e676; }
-        #btn-brake { bottom: 25px; right: 20px; width: 70px; height: 70px; background: rgba(255, 23, 68, 0.4); border-color: #ff1744; }
+        #btn-left { bottom: 30px; left: 20px; width: 70px; height: 70px; }
+        #btn-right { bottom: 30px; left: 100px; width: 70px; height: 70px; }
+        #btn-gas { bottom: 110px; right: 25px; width: 75px; height: 75px; background: rgba(0, 230, 118, 0.4); border-color: #00e676; }
+        #btn-brake { bottom: 25px; right: 25px; width: 75px; height: 75px; background: rgba(255, 23, 68, 0.4); border-color: #ff1744; }
+        #btn-horn { bottom: 195px; right: 30px; width: 60px; height: 60px; background: rgba(255, 193, 7, 0.4); border-color: #ffc107; font-size: 16px; }
+        #btn-light { bottom: 195px; left: 30px; width: 60px; height: 60px; background: rgba(3, 169, 244, 0.4); border-color: #03a9f4; font-size: 16px; }
         
-        #menu-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; text-align: center; padding: 20px; }
-        .title { font-size: 36px; font-weight: bold; color: #ffd700; text-shadow: 0 0 15px #ffd700; margin-bottom: 5px; }
-        .subtitle { font-size: 14px; color: #00f0ff; margin-bottom: 25px; letter-spacing: 2px; }
-        .play-btn { background: linear-gradient(45deg, #ff007f, #7928ca); color: white; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 0 15px rgba(255, 0, 127, 0.6); }
+        /* Menu */
+        #menu-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; text-align: center; }
+        .title { font-size: 40px; font-weight: 900; color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+        .play-btn { background: linear-gradient(45deg, #ff007f, #7928ca); color: white; border: none; padding: 16px 45px; font-size: 22px; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 20px; box-shadow: 0 0 20px rgba(255, 0, 127, 0.5); }
     </style>
-    <!-- Load Three.js safely -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <div id="canvas-container"></div>
 
     <div id="hud">
-        <div class="hud-card">🪙 কয়েন: <span id="coin-count">0</span></div>
-        <div class="hud-card">🚩 স্কোর: <span id="score">0</span>m</div>
+        <div class="hud-card">🪙 কয়েন: <span id="coin-count" style="color:#ffd700;">0</span></div>
+        <div class="hud-card">🚩 দূরত্ব: <span id="score" style="color:#00f0ff;">0</span>m</div>
     </div>
 
     <div id="speedo">
         <div id="speed-val">0</div>
-        <div style="font-size: 9px; color: #aaa;">KM/H</div>
+        <div style="font-size: 10px; color: #aaa;">KM/H</div>
     </div>
 
     <div id="btn-left" class="control-btn">◀</div>
     <div id="btn-right" class="control-btn">▶</div>
     <div id="btn-gas" class="control-btn">🚀</div>
     <div id="btn-brake" class="control-btn">🛑</div>
+    <div id="btn-horn" class="control-btn">📢</div>
+    <div id="btn-light" class="control-btn">💡</div>
 
     <div id="menu-overlay">
-        <div class="title">AS GAME</div>
-        <div class="subtitle">3D Bus Simulator</div>
+        <div class="title">AS BUS SIMULATOR</div>
+        <div style="color:#00f0ff; letter-spacing:2px; margin-top:5px;">INDONESIAN STYLE 3D EDITION</div>
         <button class="play-btn" onclick="startGame()">গেম শুরু করুন 🎮</button>
     </div>
 
     <script>
         let scene, camera, renderer, bus;
-        let speed = 0, maxSpeed = 1.0, acceleration = 0.015, friction = 0.008;
+        let headlights = [], headlightState = false;
+        let speed = 0, maxSpeed = 1.4, acceleration = 0.015, friction = 0.008;
         let busX = 0, steerSpeed = 0.12;
-        let coins = [], roadTiles = [];
+        let roadSegments = [], coins = [], trafficBuses = [];
         let totalCoins = 0, score = 0;
         let keys = { left: false, right: false, gas: false, brake: false };
         let isPlaying = false;
+        let curveAngle = 0;
 
         function init() {
             const container = document.getElementById('canvas-container');
             
-            // Scene Setup
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87ceeb); // Sky blue background
-            scene.fog = new THREE.Fog(0x87ceeb, 20, 150);
+            scene.background = new THREE.Color(0x0a0f1d);
+            scene.fog = new THREE.FogExp2(0x0a0f1d, 0.012);
 
-            // Camera
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 4, -9);
-            camera.lookAt(0, 1.5, 5);
+            camera.position.set(0, 4.5, -9);
+            camera.lookAt(0, 2, 5);
 
-            // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
             container.appendChild(renderer.domElement);
 
-            // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            const dirLight = new THREE.DirectionalLight(0xffd1a4, 0.8);
             dirLight.position.set(20, 40, -20);
             scene.add(dirLight);
 
-            // Build Bus and Road
             createBus();
-            for (let i = 0; i < 8; i++) {
-                spawnRoadTile(i * 30);
-            }
-
+            createRoadWorld();
             setupControls();
+
             window.addEventListener('resize', onWindowResize);
             animate();
         }
 
+        // Detailed Bus with "AS" branding on back
         function createBus() {
             bus = new THREE.Group();
 
-            // Bus Body (Green BD Local Bus)
-            const bodyGeo = new THREE.BoxGeometry(2.2, 2.0, 5.0);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x008037 });
-            const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-            bodyMesh.position.y = 1.3;
-            bus.add(bodyMesh);
+            // Body
+            const bodyGeo = new THREE.BoxGeometry(2.3, 2.3, 5.8);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x008037, roughness: 0.2 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 1.4;
+            bus.add(body);
 
-            // Roof Red Stripe
-            const stripeGeo = new THREE.BoxGeometry(2.22, 0.3, 5.02);
-            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xe63946 });
-            const stripeMesh = new THREE.Mesh(stripeGeo, stripeMat);
-            stripeMesh.position.y = 1.7;
-            bus.add(stripeMesh);
+            // Roof Deco
+            const roofGeo = new THREE.BoxGeometry(2.32, 0.3, 5.82);
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0xda291c });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = 1.85;
+            bus.add(roof);
 
             // Windows
-            const winMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-            const winGeo = new THREE.BoxGeometry(2.25, 0.7, 3.8);
+            const winGeo = new THREE.BoxGeometry(2.36, 0.9, 4.5);
+            const winMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1 });
             const windows = new THREE.Mesh(winGeo, winMat);
-            windows.position.set(0, 1.7, 0.2);
+            windows.position.set(0, 1.8, 0.2);
             bus.add(windows);
+
+            // Back Plate with "AS" Branding
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#da291c'; ctx.fillRect(0, 0, 256, 128);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'Bold 80px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('AS', 128, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const backPlateGeo = new THREE.PlaneGeometry(1.8, 1.0);
+            const backPlateMat = new THREE.MeshBasicMaterial({ map: texture });
+            const backPlate = new THREE.Mesh(backPlateGeo, backPlateMat);
+            backPlate.position.set(0, 1.6, -2.91);
+            backPlate.rotation.y = Math.PI;
+            bus.add(backPlate);
+
+            // Headlights
+            for (let x of [-0.8, 0.8]) {
+                const light = new THREE.SpotLight(0xffffff, 0, 40, Math.PI / 6, 0.5);
+                light.position.set(x, 1.2, 2.9);
+                light.target.position.set(x, 0, 15);
+                bus.add(light);
+                bus.add(light.target);
+                headlights.push(light);
+            }
 
             scene.add(bus);
         }
 
-        function spawnRoadTile(zPos) {
-            const tile = new THREE.Group();
-            tile.position.z = zPos;
-
-            // Green Ground
-            const grassGeo = new THREE.PlaneGeometry(60, 30);
-            const grassMat = new THREE.MeshStandardMaterial({ color: 0x2d6a4f });
-            const grass = new THREE.Mesh(grassGeo, grassMat);
-            grass.rotation.x = -Math.PI / 2;
-            tile.add(grass);
-
-            // Road Track
-            const roadGeo = new THREE.PlaneGeometry(10, 30);
-            const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
-            const roadMesh = new THREE.Mesh(roadGeo, roadMat);
-            roadMesh.rotation.x = -Math.PI / 2;
-            roadMesh.position.y = 0.01;
-            tile.add(roadMesh);
-
-            // Center Line
-            const lineGeo = new THREE.PlaneGeometry(0.3, 15);
-            const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const line = new THREE.Mesh(lineGeo, lineMat);
-            line.rotation.x = -Math.PI / 2;
-            line.position.set(0, 0.02, 0);
-            tile.add(line);
-
-            // Roadside Trees
-            for (let side of [-7, 7]) {
-                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 3);
-                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
-                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-                trunk.position.set(side, 1.5, 0);
-
-                const leavesGeo = new THREE.SphereGeometry(2, 8, 8);
-                const leavesMat = new THREE.MeshStandardMaterial({ color: 0x1b4332 });
-                const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-                leaves.position.y = 2.0;
-                trunk.add(leaves);
-
-                tile.add(trunk);
-            }
-
-            scene.add(tile);
-            roadTiles.push(tile);
-
-            // Coin Spawn
-            if (Math.random() > 0.4) {
-                spawnCoin(zPos);
+        function createRoadWorld() {
+            for (let i = 0; i < 12; i++) {
+                spawnSegment(i * 25);
             }
         }
 
+        function spawnSegment(zPos) {
+            const seg = new THREE.Group();
+            seg.position.z = zPos;
+
+            // Ground
+            const groundGeo = new THREE.PlaneGeometry(80, 25);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e3a1e });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            seg.add(ground);
+
+            // Curved Road Simulation
+            const roadGeo = new THREE.PlaneGeometry(11, 25);
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const road = new THREE.Mesh(roadGeo, roadMat);
+            road.rotation.x = -Math.PI / 2;
+            road.position.y = 0.01;
+            seg.add(road);
+
+            // Buildings / Houses
+            for (let side of [-12, 12]) {
+                if (Math.random() > 0.4) {
+                    const bGeo = new THREE.BoxGeometry(6, 4 + Math.random()*3, 8);
+                    const bMat = new THREE.MeshStandardMaterial({ color: Math.random() > 0.5 ? 0x8b4513 : 0x4a5568 });
+                    const building = new THREE.Mesh(bGeo, bMat);
+                    building.position.set(side + (side > 0 ? 4 : -4), 2, 0);
+                    seg.add(building);
+                }
+            }
+
+            scene.add(seg);
+            roadSegments.push(seg);
+
+            if (Math.random() > 0.4) spawnCoin(zPos);
+        }
+
         function spawnCoin(z) {
-            const coinGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 16);
-            const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+            const coinGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.1, 16);
+            const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8 });
             const coin = new THREE.Mesh(coinGeo, coinMat);
             coin.rotation.x = Math.PI / 2;
-            coin.position.set((Math.random() - 0.5) * 6, 1.0, z);
+            coin.position.set((Math.random() - 0.5) * 7, 1.2, z);
             scene.add(coin);
             coins.push(coin);
         }
@@ -195,18 +215,32 @@
         function setupControls() {
             const bindBtn = (id, key) => {
                 const el = document.getElementById(id);
-                const start = (e) => { e.preventDefault(); keys[key] = true; };
-                const end = (e) => { e.preventDefault(); keys[key] = false; };
-                el.addEventListener('touchstart', start, {passive: false});
-                el.addEventListener('touchend', end, {passive: false});
-                el.addEventListener('mousedown', start);
-                el.addEventListener('mouseup', end);
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+                el.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+                el.addEventListener('mousedown', () => keys[key] = true);
+                el.addEventListener('mouseup', () => keys[key] = false);
             };
 
             bindBtn('btn-left', 'left');
             bindBtn('btn-right', 'right');
             bindBtn('btn-gas', 'gas');
             bindBtn('btn-brake', 'brake');
+
+            document.getElementById('btn-horn').addEventListener('click', () => {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            });
+
+            document.getElementById('btn-light').addEventListener('click', () => {
+                headlightState = !headlightState;
+                headlights.forEach(l => l.intensity = headlightState ? 4 : 0);
+            });
         }
 
         function startGame() {
@@ -222,25 +256,28 @@
                 else if (keys.brake) speed = Math.max(speed - acceleration * 2, 0);
                 else speed = Math.max(speed - friction, 0);
 
-                if (keys.left && busX > -3.5) busX -= steerSpeed;
-                if (keys.right && busX < 3.5) busX += steerSpeed;
+                if (keys.left && busX > -4.0) busX -= steerSpeed;
+                if (keys.right && busX < 4.0) busX += steerSpeed;
 
                 bus.position.x = busX;
+                bus.rotation.y = (keys.left ? 0.06 : keys.right ? -0.06 : 0);
 
-                // Loop Environment
-                roadTiles.forEach(tile => {
-                    tile.position.z -= speed * 8;
-                    if (tile.position.z < -20) {
-                        tile.position.z += 240;
+                // Road Movement & Curved Effect
+                curveAngle += 0.01;
+                roadSegments.forEach(seg => {
+                    seg.position.z -= speed * 10;
+                    seg.position.x = Math.sin(seg.position.z * 0.02) * 3; // Curved road
+                    if (seg.position.z < -20) {
+                        seg.position.z += 300;
                     }
                 });
 
-                // Move & Collect Coins
+                // Coin Collection
                 coins.forEach((coin, idx) => {
-                    coin.position.z -= speed * 8;
+                    coin.position.z -= speed * 10;
                     coin.rotation.z += 0.05;
 
-                    if (Math.abs(coin.position.z - bus.position.z) < 2 && Math.abs(coin.position.x - bus.position.x) < 1.5) {
+                    if (Math.abs(coin.position.z - bus.position.z) < 2.5 && Math.abs(coin.position.x - bus.position.x) < 1.8) {
                         scene.remove(coin);
                         coins.splice(idx, 1);
                         totalCoins += 10;
@@ -253,9 +290,9 @@
                     }
                 });
 
-                score += Math.floor(speed * 8);
+                score += Math.floor(speed * 10);
                 document.getElementById('score').innerText = score;
-                document.getElementById('speed-val').innerText = Math.floor(speed * 100);
+                document.getElementById('speed-val').innerText = Math.floor(speed * 110);
             }
 
             renderer.render(scene, camera);
@@ -271,3 +308,4 @@
     </script>
 </body>
 </html>
+
