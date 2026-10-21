@@ -1,64 +1,440 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AS Game - Tap & Earn</title>
-    <style>
-        body {
-            background-color: #1a1a2e;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            user-select: none;
-        }
-        h1 {
-            color: #f1c40f;
-            margin-bottom: 10px;
-        }
-        .score-board {
-            font-size: 28px;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-        .coin-btn {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #f39c12, #d35400);
-            border: 8px solid #f1c40f;
-            box-shadow: 0 0 25px rgba(241, 196, 15, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 70px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .coin-btn:active {
-            transform: scale(0.92);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AS Game Platform</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .active-screen {
+      display: flex;
+    }
+    
+    /* Main Menu Styling */
+    #main-menu {
+      background: linear-gradient(135deg, #2c3e50, #000000);
+      text-align: center;
+      padding: 20px;
+    }
+    .logo-badge {
+      width: 100px;
+      height: 100px;
+      background: #f1c40f;
+      color: #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      border: 4px solid #fff;
+      box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #f1c40f;
+      margin-bottom: 5px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    p.welcome {
+      font-size: 16px;
+      color: #ecf0f1;
+      margin-bottom: 25px;
+    }
+    .player-info {
+      background: rgba(255,255,255,0.1);
+      padding: 10px 20px;
+      border-radius: 20px;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+    .menu-btn {
+      width: 85%;
+      max-width: 300px;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: transform 0.1s;
+    }
+    .menu-btn:active {
+      transform: scale(0.96);
+    }
+    .btn-driving {
+      background: linear-gradient(45deg, #e67e22, #f39c12);
+      color: #fff;
+    }
+    .btn-adventure {
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
+      color: #fff;
+    }
+
+    /* Game Header Canvas Wrapper */
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .game-header {
+      height: 50px;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 15px;
+      z-index: 10;
+    }
+    .game-header button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .score-display {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f1c40f;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 50px);
+      background: #000;
+      touch-action: none;
+    }
+
+    /* Controls Overlay */
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-sizing: border-size;
+      z-index: 10;
+    }
+    .ctrl-btn {
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.3);
+      border: 2px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
 </head>
 <body>
 
+  <!-- MAIN MENU -->
+  <div id="main-menu" class="screen active-screen">
+    <div class="logo-badge">AS</div>
     <h1>AS Game</h1>
-    <div class="score-board">কয়েন: <span id="score">0</span></div>
+    <p class="welcome" id="welcome-msg">Welcome to AS Game Platform</p>
+    <div class="player-info" id="player-display">Player: Guest | Coins: 0</div>
+    <button class="menu-btn btn-driving" onclick="startGame('driving')">🚗 AS Desert Driving</button>
+    <button class="menu-btn btn-adventure" onclick="startGame('adventure')">👧 Village Adventure</button>
+  </div>
+
+  <!-- DRIVING GAME -->
+  <div id="driving-screen" class="screen">
+    <div class="game-container">
+      <div class="game-header">
+        <button onclick="exitGame()">Back</button>
+        <div class="score-display" id="driving-score">Coins: 0</div>
+      </div>
+      <canvas id="drivingCanvas"></canvas>
+      <div class="controls">
+        <div class="ctrl-btn" id="btn-left">◀</div>
+        <div class="ctrl-btn" id="btn-right">▶</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVENTURE GAME -->
+  <div id="adventure-screen" class="screen">
+    <div class="game-container">
+      <div class="game-header">
+        <button onclick="exitGame()">Back</button>
+        <div class="score-display" id="adventure-score">Coins: 0</div>
+      </div>
+      <canvas id="adventureCanvas"></canvas>
+      <div class="controls" style="justify-content: flex-end;">
+        <div class="ctrl-btn" id="btn-jump" style="width: 80px; height: 80px; background: rgba(46,204,113,0.5);">JUMP</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Telegram WebApp
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    let playerName = "Player";
+    let totalCoins = 0;
+
+    if (tg) {
+      tg.expand();
+      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        playerName = tg.initDataUnsafe.user.first_name || "Player";
+      }
+    }
     
-    <div class="coin-btn" onclick="tapCoin()">🪙</div>
+    document.getElementById("welcome-msg").innerText = "Welcome " + playerName + " to AS Game!";
+    document.getElementById("player-display").innerText = "Player: " + playerName + " | Coins: " + totalCoins;
 
-    <script>
-        let count = 0;
-        function tapCoin() {
-            count++;
-            document.getElementById('score').innerText = count;
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+      document.getElementById(id).classList.add('active-screen');
+    }
+
+    function exitGame() {
+      stopDrivingGame();
+      stopAdventureGame();
+      document.getElementById("player-display").innerText = "Player: " + playerName + " | Coins: " + totalCoins;
+      showScreen('main-menu');
+    }
+
+    /* ---------------- DRIVING GAME LOGIC ---------------- */
+    let drivingLoop;
+    const dCanvas = document.getElementById('drivingCanvas');
+    const dCtx = dCanvas.getContext('2d');
+    let carX, carY, roadOffset = 0, coins = [], signs = [], obstacles = [];
+    let isMovingLeft = false, isMovingRight = false;
+
+    function startGame(type) {
+      if(type === 'driving') {
+        showScreen('driving-screen');
+        initDrivingGame();
+      } else {
+        showScreen('adventure-screen');
+        initAdventureGame();
+      }
+    }
+
+    function initDrivingGame() {
+      dCanvas.width = window.innerWidth;
+      dCanvas.height = window.innerHeight - 50;
+      carX = dCanvas.width / 2 - 20;
+      carY = dCanvas.height - 100;
+      coins = [];
+      signs = [];
+      
+      // Touch listeners
+      const bLeft = document.getElementById('btn-left');
+      const bRight = document.getElementById('btn-right');
+      bLeft.ontouchstart = () => isMovingLeft = true;
+      bLeft.ontouchend = () => isMovingLeft = false;
+      bRight.ontouchstart = () => isMovingRight = true;
+      bRight.ontouchend = () => isMovingRight = false;
+
+      drivingLoop = setInterval(updateDriving, 1000 / 60);
+    }
+
+    function updateDriving() {
+      dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+      
+      // Saudi Desert Background
+      dCtx.fillStyle = '#e67e22';
+      dCtx.fillRect(0, 0, dCanvas.width, dCanvas.height);
+
+      // Desert Road
+      const roadWidth = dCanvas.width * 0.7;
+      const roadLeft = (dCanvas.width - roadWidth) / 2;
+      dCtx.fillStyle = '#7f8c8d';
+      dCtx.fillRect(roadLeft, 0, roadWidth, dCanvas.height);
+
+      // Road Lines
+      roadOffset = (roadOffset + 5) % 40;
+      dCtx.fillStyle = '#fff';
+      for(let y = roadOffset - 40; y < dCanvas.height; y += 40) {
+        dCtx.fillRect(dCanvas.width / 2 - 4, y, 8, 20);
+      }
+
+      // Spawn Signs (AS Game Signboard)
+      if (Math.random() < 0.02) {
+        signs.push({ y: -50, x: roadLeft - 40 });
+      }
+      dCtx.fillStyle = '#f1c40f';
+      signs.forEach((s, i) => {
+        s.y += 4;
+        dCtx.fillRect(s.x, s.y, 35, 25);
+        dCtx.fillStyle = '#000';
+        dCtx.font = '10px Arial';
+        dCtx.fillText('AS Game', s.x + 2, s.y + 16);
+        dCtx.fillStyle = '#f1c40f';
+        if (s.y > dCanvas.height) signs.splice(i, 1);
+      });
+
+      // Spawn Coins
+      if (Math.random() < 0.03) {
+        coins.push({ x: roadLeft + 20 + Math.random() * (roadWidth - 40), y: -20 });
+      }
+      
+      // Draw Coins
+      coins.forEach((c, i) => {
+        c.y += 4;
+        dCtx.beginPath();
+        dCtx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+        dCtx.fillStyle = '#f1c40f';
+        dCtx.fill();
+        dCtx.strokeStyle = '#d35400';
+        dCtx.stroke();
+
+        // Collision
+        if (Math.hypot(c.x - (carX + 20), c.y - (carY + 30)) < 25) {
+          totalCoins++;
+          coins.splice(i, 1);
+          document.getElementById('driving-score').innerText = "Coins: " + totalCoins;
+        } else if (c.y > dCanvas.height) {
+          coins.splice(i, 1);
         }
-    </script>
+      });
 
+      // Move Car
+      if (isMovingLeft && carX > roadLeft) carX -= 5;
+      if (isMovingRight && carX < roadLeft + roadWidth - 40) carX += 5;
+
+      // Draw Car
+      dCtx.fillStyle = '#e74c3c';
+      dCtx.fillRect(carX, carY, 40, 60); // Car Body
+      dCtx.fillStyle = '#34495e';
+      dCtx.fillRect(carX + 5, carY + 10, 30, 15); // Windshield
+    }
+
+    function stopDrivingGame() {
+      clearInterval(drivingLoop);
+    }
+
+    /* ---------------- ADVENTURE GAME LOGIC ---------------- */
+    let advLoop;
+    const aCanvas = document.getElementById('adventureCanvas');
+    const aCtx = aCanvas.getContext('2d');
+    let charY, charVelocity = 0, isJumping = false, advCoins = [], obstaclesAdv = [];
+    let groundY;
+
+    function initAdventureGame() {
+      aCanvas.width = window.innerWidth;
+      aCanvas.height = window.innerHeight - 50;
+      groundY = aCanvas.height - 80;
+      charY = groundY;
+      advCoins = [];
+      obstaclesAdv = [];
+
+      const bJump = document.getElementById('btn-jump');
+      bJump.ontouchstart = () => {
+        if (!isJumping) {
+          charVelocity = -15;
+          isJumping = true;
+        }
+      };
+
+      advLoop = setInterval(updateAdventure, 1000 / 60);
+    }
+
+    function updateAdventure() {
+      aCtx.clearRect(0, 0, aCanvas.width, aCanvas.height);
+
+      // Village Sky & Grass
+      aCtx.fillStyle = '#74b9ff';
+      aCtx.fillRect(0, 0, aCanvas.width, groundY);
+      aCtx.fillStyle = '#2ecc71';
+      aCtx.fillRect(0, groundY, aCanvas.width, aCanvas.height - groundY);
+
+      // Village Path
+      aCtx.fillStyle = '#e1b12c';
+      aCtx.fillRect(0, groundY - 10, aCanvas.width, 10);
+
+      // Character Gravity
+      charY += charVelocity;
+      charVelocity += 0.8;
+      if (charY >= groundY) {
+        charY = groundY;
+        isJumping = false;
+      }
+
+      // Draw Mina-Style Character
+      aCtx.fillStyle = '#e84393'; // Pink Dress
+      aCtx.fillRect(50, charY - 40, 25, 40);
+      aCtx.fillStyle = '#ffeaa7'; // Head
+      aCtx.beginPath();
+      aCtx.arc(62, charY - 50, 12, 0, Math.PI * 2);
+      aCtx.fill();
+
+      // Spawn Obstacles (Hurdles)
+      if (Math.random() < 0.015) {
+        obstaclesAdv.push({ x: aCanvas.width, y: groundY - 30 });
+      }
+      obstaclesAdv.forEach((obs, i) => {
+        obs.x -= 4;
+        aCtx.fillStyle = '#d63031';
+        aCtx.fillRect(obs.x, obs.y, 20, 30);
+
+        if (obs.x < -20) obstaclesAdv.splice(i, 1);
+      });
+
+      // Spawn Coins
+      if (Math.random() < 0.02) {
+        advCoins.push({ x: aCanvas.width, y: groundY - 60 - Math.random() * 40 });
+      }
+      advCoins.forEach((c, i) => {
+        c.x -= 4;
+        aCtx.beginPath();
+        aCtx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+        aCtx.fillStyle = '#f1c40f';
+        aCtx.fill();
+
+        // Collect
+        if (Math.hypot(c.x - 62, c.y - (charY - 20)) < 25) {
+          totalCoins++;
+          advCoins.splice(i, 1);
+          document.getElementById('adventure-score').innerText = "Coins: " + totalCoins;
+        } else if (c.x < -10) {
+          advCoins.splice(i, 1);
+        }
+      });
+    }
+
+    function stopAdventureGame() {
+      clearInterval(advLoop);
+    }
+  </script>
 </body>
 </html>
