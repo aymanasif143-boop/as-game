@@ -1,299 +1,763 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AS Gaming - Hill Climb</title>
+    <title>AS Reebook</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#1877f2', // Classic Social Blue
+                            600: '#166fe5',
+                            700: '#0866ff',
+                            dark: '#18191a',
+                            card: '#242526',
+                            hover: '#3a3b3c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Impact', 'Arial Black', sans-serif; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #111; }
-        
-        #game-container { position: relative; width: 100vw; height: 100vh; background: #87CEEB; }
-        canvas { display: block; width: 100%; height: 100%; }
-
-        /* UI Screens */
-        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
-        
-        /* Splash Screen */
-        #splash-screen { background: #0a0a0a; color: #fff; animation: fadeOut 0.5s 2s forwards; }
-        .logo-box { background: linear-gradient(45deg, #ff0055, #ff5500); padding: 20px 40px; border-radius: 20px; box-shadow: 0 0 30px #ff5500; text-align: center; }
-        
-        /* Main Menu */
-        #main-menu { background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); }
-        .top-bar { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; }
-        .stat-card { background: rgba(0,0,0,0.6); border: 2px solid #ffd700; padding: 8px 20px; border-radius: 25px; color: #ffd700; font-size: 20px; }
-
-        .menu-title { font-size: 48px; color: #fff; text-shadow: 3px 3px 0 #000, -2px -2px 0 #ff5500; margin-bottom: 10px; }
-        .subtitle { font-size: 20px; color: #ffd700; margin-bottom: 30px; }
-
-        .garage-view { width: 320px; height: 180px; background: rgba(255,255,255,0.1); border: 4px solid #fff; border-radius: 15px; display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 20px; }
-        
-        .btn { background: linear-gradient(0deg, #28a745, #34ce57); border: 3px solid #fff; border-radius: 12px; color: #fff; font-size: 24px; padding: 12px 40px; cursor: pointer; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #1e7e34; }
-        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1e7e34; }
-        
-        /* In-Game Controls */
-        .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: none; }
-        .pedal { width: 90px; height: 110px; background: #333; border: 4px solid #aaa; border-radius: 15px; display: flex; justify-content: center; align-items: center; color: white; font-size: 18px; pointer-events: auto; touch-action: manipulation; box-shadow: 0 8px 0 #111; }
-        .pedal:active { transform: translateY(4px); box-shadow: 0 4px 0 #111; }
-        #btn-gas { background: linear-gradient(180deg, #28a745, #155724); border-color: #5cdb95; }
-        #btn-brake { background: linear-gradient(180deg, #dc3545, #721c24); border-color: #ff7b89; }
-
-        #game-hud { position: absolute; top: 15px; left: 15px; z-index: 20; pointer-events: none; color: white; font-size: 24px; text-shadow: 2px 2px 0 #000; }
-        
-        /* Game Over */
-        #game-over { background: rgba(0,0,0,0.85); display: none; }
-        .go-title { color: #ff3333; font-size: 50px; text-shadow: 3px 3px 0 #000; margin-bottom: 15px; }
+        /* Custom Scrollbar for sleek visual style */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+        }
+        /* Touch safety */
+        body {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 dark:bg-[#18191a] text-gray-900 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
 
-<div id="game-container">
-    <!-- Splash Screen -->
-    <div id="splash-screen" class="overlay-screen">
-        <div class="logo-box">
-            <h1 style="font-size: 42px; color: #fff;">AS GAMING</h1>
-            <p style="color: #ffd700; margin-top: 5px;">WELCOME</p>
-        </div>
-    </div>
-
-    <!-- Main Menu -->
-    <div id="main-menu" class="overlay-screen" style="display: none;">
-        <div class="top-bar">
-            <div class="stat-card">🪙 <span id="menu-coins">0</span></div>
-            <div class="stat-card" style="border-color: #00ffff; color: #00ffff;">AS PLAY</div>
-        </div>
-
-        <h1 class="menu-title">AS CAR PLAYING</h1>
-        <div class="subtitle">HILL CLIMB EDITION</div>
-
-        <div class="garage-view">
-            <div style="font-size: 70px;">🚜</div>
-            <div style="position: absolute; bottom: 10px; background: #ff5500; color: #fff; padding: 2px 10px; border-radius: 5px; font-size: 14px;">AS MONSTER</div>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#242526] border-b border-gray-200 dark:border-gray-700/60 z-50 flex items-center justify-between px-4 shadow-sm">
+        <!-- Left: Logo & Search -->
+        <div class="flex items-center gap-2 md:gap-4">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('feed')">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-md">
+                    AS
+                </div>
+                <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent hidden sm:inline">
+                    AS Reebook
+                </span>
+            </div>
+            
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Search AS Reebook..." 
+                    class="bg-gray-100 dark:bg-[#3a3b3c] pl-9 pr-4 py-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36 sm:w-60 transition-all">
+            </div>
         </div>
 
-        <button class="btn" onclick="startGame()">START GAME 🏁</button>
-    </div>
+        <!-- Center: Navigation Tabs (Desktop) -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 h-full">
+            <button onclick="switchTab('feed')" id="nav-feed" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-blue-600 text-blue-600 transition">
+                <i class="fa-solid fa-house text-xl"></i>
+            </button>
+            <button onclick="switchTab('watch')" id="nav-watch" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
+                <i class="fa-solid fa-tv text-xl"></i>
+            </button>
+            <button onclick="switchTab('friends')" id="nav-friends" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
+                <i class="fa-solid fa-user-group text-xl"></i>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn h-full px-6 flex items-center justify-center border-b-4 border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] rounded-lg my-1 transition">
+                <i class="fa-solid fa-circle-user text-xl"></i>
+            </button>
+        </nav>
 
-    <!-- Game Over Screen -->
-    <div id="game-over" class="overlay-screen">
-        <h1 class="go-title">DRIVER DOWN! 💥</h1>
-        <p style="color: #fff; font-size: 22px; margin-bottom: 20px;">Score: <span id="final-dist">0</span>m</p>
-        <button class="btn" onclick="restartGame()">RETRY 🔄</button>
-    </div>
+        <!-- Right: Actions & Profile -->
+        <div class="flex items-center gap-2">
+            <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
+                <i id="darkModeIcon" class="fa-solid fa-moon"></i>
+            </button>
+            
+            <button onclick="switchTab('notifications')" class="relative w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
+                <i class="fa-solid fa-bell"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#242526]">3</span>
+            </button>
 
-    <!-- HUD -->
-    <div id="game-hud">
-        <div>🚩 <span id="dist-val">0</span>m</div>
-        <div style="color: #ffd700; margin-top: 5px;">🪙 <span id="coin-val">0</span></div>
-    </div>
+            <button onclick="toggleMessages()" class="relative w-10 h-10 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] flex items-center justify-center text-gray-700 dark:text-gray-200 transition">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#242526]">2</span>
+            </button>
 
-    <!-- Controls -->
-    <div class="controls">
-        <div id="btn-brake" class="pedal">BRAKE</div>
-        <div id="btn-gas" class="pedal">GAS</div>
-    </div>
+            <!-- User Avatar button -->
+            <div onclick="switchTab('profile')" class="flex items-center gap-2 cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-[#3a3b3c] transition">
+                <img id="headerAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-blue-500">
+            </div>
+        </div>
+    </header>
 
-    <canvas id="canvas"></canvas>
-</div>
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white dark:bg-[#242526] border-t border-gray-200 dark:border-gray-700/60 z-50 flex items-center justify-around px-2">
+        <button onclick="switchTab('feed')" id="m-nav-feed" class="flex flex-col items-center justify-center text-blue-600">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] mt-0.5">Home</span>
+        </button>
+        <button onclick="switchTab('watch')" id="m-nav-watch" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-tv text-lg"></i>
+            <span class="text-[10px] mt-0.5">Watch</span>
+        </button>
+        <button onclick="switchTab('friends')" id="m-nav-friends" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-user-group text-lg"></i>
+            <span class="text-[10px] mt-0.5">Friends</span>
+        </button>
+        <button onclick="switchTab('notifications')" id="m-nav-notifications" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-bell text-lg"></i>
+            <span class="text-[10px] mt-0.5">Alerts</span>
+        </button>
+        <button onclick="switchTab('profile')" id="m-nav-profile" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-circle-user text-lg"></i>
+            <span class="text-[10px] mt-0.5">Profile</span>
+        </button>
+    </nav>
 
-<script>
-    // Matter.js Aliases
-    const { Engine, Render, Runner, Bodies, Composite, Body, Constraint, Vector } = Matter;
-
-    let engine, world, render, runner;
-    let car, rearWheel, frontWheel;
-    let coins = [];
-    let scoreCoins = 0, distance = 0;
-    let isGameOver = false, isPlaying = false;
-    let gasPressed = false, brakePressed = false;
-
-    const canvas = document.getElementById('canvas');
-
-    function init() {
-        setTimeout(() => {
-            document.getElementById('splash-screen').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-        }, 2200);
-
-        setupPhysics();
-        setupInput();
-    }
-
-    function setupPhysics() {
-        engine = Engine.create();
-        world = engine.world;
-
-        render = Render.create({
-            canvas: canvas,
-            engine: engine,
-            options: {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                wireframes: false,
-                background: '#70c5ce'
-            }
-        });
-
-        Render.run(render);
-        runner = Runner.create();
-        Runner.run(runner, engine);
-    }
-
-    function createTerrainAndCar() {
-        Composite.clear(world);
-
-        // Generate Hills (Terrain)
-        const terrainPoints = [];
-        let startX = -500;
-        let startY = window.innerHeight - 150;
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="pt-16 pb-20 md:pb-10 max-w-7xl mx-auto px-2 sm:px-4">
         
-        for (let i = 0; i < 200; i++) {
-            startX += 80;
-            startY += Math.sin(i * 0.3) * 40 + (Math.random() * 10 - 5);
-            terrainPoints.push({ x: startX, y: startY });
-        }
+        <!-- FEED TAB -->
+        <div id="tab-feed" class="tab-content grid grid-cols-1 lg:grid-cols-4 gap-4">
+            
+            <!-- Left Sidebar -->
+            <aside class="hidden lg:block lg:col-span-1 space-y-2 sticky top-20 h-fit">
+                <div onclick="switchTab('profile')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
+                    <span class="font-semibold text-sm">AS Reebook User</span>
+                </div>
+                <div onclick="switchTab('friends')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
+                    <i class="fa-solid fa-user-group text-xl text-blue-500 w-8"></i>
+                    <span class="font-semibold text-sm">Friends</span>
+                </div>
+                <div onclick="switchTab('watch')" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
+                    <i class="fa-solid fa-circle-play text-xl text-red-500 w-8"></i>
+                    <span class="font-semibold text-sm">Watch Videos</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
+                    <i class="fa-solid fa-[#1877f2] fa-bookmark text-xl text-purple-500 w-8"></i>
+                    <span class="font-semibold text-sm">Saved Posts</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-200 dark:hover:bg-[#3a3b3c] cursor-pointer transition">
+                    <i class="fa-solid fa-gamepad text-xl text-green-500 w-8"></i>
+                    <span class="font-semibold text-sm">AS Gaming Hub</span>
+                </div>
+                <hr class="border-gray-200 dark:border-gray-700/60 my-2">
+                <p class="text-xs text-gray-500 px-3">AS Reebook Community &copy; 2026. All rights reserved.</p>
+            </aside>
 
-        for (let i = 0; i < terrainPoints.length - 1; i++) {
-            const p1 = terrainPoints[i];
-            const p2 = terrainPoints[i+1];
-            const midX = (p1.x + p2.x) / 2;
-            const midY = (p1.y + p2.y) / 2;
-            const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-            const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            <!-- Middle Feed -->
+            <div class="lg:col-span-2 space-y-4 max-w-2xl mx-auto w-full">
+                
+                <!-- Stories Carousel -->
+                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none pt-1">
+                    <!-- Add Story -->
+                    <div class="flex-shrink-0 w-28 h-44 rounded-xl bg-white dark:bg-[#242526] relative overflow-hidden shadow cursor-pointer group border border-gray-200 dark:border-gray-700">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center border-2 border-white dark:border-[#242526]">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </div>
+                        <div class="absolute bottom-1 w-full text-center text-[11px] font-semibold text-gray-800 dark:text-gray-200">
+                            Create Story
+                        </div>
+                    </div>
 
-            const segment = Bodies.rectangle(midX, midY, len + 5, 40, {
-                isStatic: true,
-                friction: 0.9,
-                render: { fillStyle: '#5d4037' }
+                    <!-- Story Items -->
+                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
+                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
+                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Sarah Jenkins</span>
+                    </div>
+
+                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
+                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Alex Rivera</span>
+                    </div>
+
+                    <div class="flex-shrink-0 w-28 h-44 rounded-xl relative overflow-hidden shadow cursor-pointer group">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-blue-500 object-cover">
+                        <span class="absolute bottom-2 left-2 text-white font-medium text-xs">Elena Rostova</span>
+                    </div>
+                </div>
+
+                <!-- Create Post Box -->
+                <div class="bg-white dark:bg-[#242526] rounded-xl p-4 shadow border border-gray-200 dark:border-gray-700/60">
+                    <div class="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-700/60">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
+                        <button onclick="openCreatePostModal()" class="w-full text-left bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4e4f50] text-gray-500 dark:text-gray-300 px-4 py-2.5 rounded-full text-sm transition">
+                            What's on your mind, AS Reebook User?
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 px-2">
+                        <button onclick="openCreatePostModal('photo')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
+                            <i class="fa-solid fa-images text-green-500 text-lg"></i>
+                            <span class="font-medium">Photo</span>
+                        </button>
+                        <button onclick="openCreatePostModal('video')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
+                            <i class="fa-solid fa-video text-red-500 text-lg"></i>
+                            <span class="font-medium">Video</span>
+                        </button>
+                        <button onclick="openCreatePostModal('feeling')" class="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 transition text-sm">
+                            <i class="fa-solid fa-face-smile text-yellow-500 text-lg"></i>
+                            <span class="font-medium">Feeling</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feed Posts List -->
+                <div id="postsContainer" class="space-y-4">
+                    <!-- Posts will be populated dynamically via JavaScript -->
+                </div>
+
+            </div>
+
+            <!-- Right Sidebar: Suggested Friends & Trending -->
+            <aside class="hidden lg:block lg:col-span-1 space-y-4 sticky top-20 h-fit">
+                <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
+                    <h3 class="font-bold text-gray-500 dark:text-gray-400 text-sm mb-3">SUGGESTED FRIENDS</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" class="w-9 h-9 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-xs">Rahim Ahmed</p>
+                                    <p class="text-[10px] text-gray-500">4 mutual friends</p>
+                                </div>
+                            </div>
+                            <button onclick="this.innerText='Added'; this.disabled=true;" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add</button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80" class="w-9 h-9 rounded-full object-cover">
+                                <div>
+                                    <p class="font-semibold text-xs">Nusrat Jahan</p>
+                                    <p class="text-[10px] text-gray-500">8 mutual friends</p>
+                                </div>
+                            </div>
+                            <button onclick="this.innerText='Added'; this.disabled=true;" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
+                    <h3 class="font-bold text-gray-500 dark:text-gray-400 text-sm mb-3">TRENDING ON REEBOOK</h3>
+                    <div class="space-y-2 text-sm">
+                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#ASGamingTournament</p>
+                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#ASReebookLaunch</p>
+                        <p class="font-medium text-blue-600 hover:underline cursor-pointer">#TechUpdate2026</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- WATCH TAB -->
+        <div id="tab-watch" class="tab-content hidden max-w-2xl mx-auto space-y-4">
+            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60 flex items-center justify-between">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-play text-red-500"></i> AS Reebook Watch
+                </h2>
+                <span class="text-xs bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full font-semibold">Live Streams & Clips</span>
+            </div>
+            <div id="watchContainer" class="space-y-4">
+                <!-- Video Posts loaded here -->
+            </div>
+        </div>
+
+        <!-- FRIENDS TAB -->
+        <div id="tab-friends" class="tab-content hidden max-w-4xl mx-auto space-y-4">
+            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
+                <h2 class="text-xl font-bold mb-4">Friends & Connections</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <!-- Friend Card -->
+                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
+                        <h4 class="font-bold text-sm mt-2">Alex Rivera</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">12 Mutuals</p>
+                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
+                        <h4 class="font-bold text-sm mt-2">Sarah Jenkins</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">24 Mutuals</p>
+                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
+                        <h4 class="font-bold text-sm mt-2">Tanvir Hassan</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">5 Mutuals</p>
+                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 text-center pb-3">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-32 object-cover">
+                        <h4 class="font-bold text-sm mt-2">Elena Rostova</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">19 Mutuals</p>
+                        <button class="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-lg">Message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS TAB -->
+        <div id="tab-notifications" class="tab-content hidden max-w-2xl mx-auto space-y-3">
+            <div class="bg-white dark:bg-[#242526] p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700/60">
+                <h2 class="text-xl font-bold mb-3">Notifications</h2>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3a3b3c] cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm"><strong>Sarah Jenkins</strong> liked your post in AS Gaming group.</p>
+                            <span class="text-xs text-blue-500 font-medium">10 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3a3b3c] cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center">
+                            <i class="fa-solid fa-comment"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm"><strong>Alex Rivera</strong> commented on your video update.</p>
+                            <span class="text-xs text-blue-500 font-medium">1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USER PROFILE TAB -->
+        <div id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-4">
+            <!-- Cover & Avatar Section -->
+            <div class="bg-white dark:bg-[#242526] rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700/60">
+                <div class="h-48 sm:h-64 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
+                    <button class="absolute bottom-3 right-3 bg-white/80 dark:bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-camera"></i> Edit Cover
+                    </button>
+                </div>
+                <div class="px-6 pb-6 relative">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 sm:-mt-20 gap-4 mb-4">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80" class="w-32 h-32 rounded-full border-4 border-white dark:border-[#242526] object-cover shadow-lg">
+                            <div>
+                                <h1 class="text-2xl font-bold">AS Reebook User</h1>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">@as_reebook_official</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openCreatePostModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Add Post
+                            </button>
+                            <button class="bg-gray-200 dark:bg-[#3a3b3c] hover:bg-gray-300 dark:hover:bg-[#4e4f50] font-semibold px-4 py-2 rounded-lg text-sm transition">
+                                <i class="fa-solid fa-pen mr-1"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <hr class="border-gray-200 dark:border-gray-700 my-4">
+
+                    <!-- Profile Stats -->
+                    <div class="flex justify-around sm:justify-start sm:gap-12 text-center">
+                        <div>
+                            <span id="profilePostCount" class="font-bold text-lg block">0</span>
+                            <span class="text-xs text-gray-500">Posts</span>
+                        </div>
+                        <div>
+                            <span class="font-bold text-lg block">1.2k</span>
+                            <span class="text-xs text-gray-500">Friends</span>
+                        </div>
+                        <div>
+                            <span id="profileLikesCount" class="font-bold text-lg block">0</span>
+                            <span class="text-xs text-gray-500">Total Likes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Posts Container -->
+            <div id="profilePostsContainer" class="space-y-4 max-w-2xl mx-auto">
+                <!-- User posts dynamically added here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CREATE POST MODAL -->
+    <div id="createPostModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#242526] w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-bold text-lg">Create Post</h3>
+                <button onclick="closeCreatePostModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 text-gray-600 dark:text-gray-300 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <p class="font-semibold text-sm">AS Reebook User</p>
+                        <span class="text-xs bg-gray-200 dark:bg-[#3a3b3c] px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-300">
+                            <i class="fa-solid fa-earth-americas mr-1"></i> Public
+                        </span>
+                    </div>
+                </div>
+
+                <textarea id="postText" rows="3" placeholder="What's on your mind?" 
+                    class="w-full bg-transparent border-none focus:outline-none text-base resize-none text-gray-800 dark:text-gray-100"></textarea>
+
+                <!-- Media Preview / Input Container -->
+                <div id="mediaInputContainer" class="space-y-2">
+                    <input type="text" id="postImageURL" placeholder="Paste Image URL (e.g. Unsplash URL)" 
+                        class="w-full bg-gray-100 dark:bg-[#3a3b3c] px-3 py-2 rounded-lg text-sm focus:outline-none border border-transparent focus:border-blue-500">
+                    <input type="text" id="postVideoURL" placeholder="Or Paste Video URL (MP4 / YouTube embed)" 
+                        class="w-full bg-gray-100 dark:bg-[#3a3b3c] px-3 py-2 rounded-lg text-sm focus:outline-none border border-transparent focus:border-blue-500">
+                </div>
+
+                <button onclick="submitNewPost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition">
+                    Post to AS Reebook
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIRECT MESSAGES DRAWER OVERLAY -->
+    <div id="messagesOverlay" class="fixed bottom-16 right-4 w-80 sm:w-96 bg-white dark:bg-[#242526] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/80 z-40 hidden flex flex-col h-96">
+        <div class="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h3 class="font-bold text-sm">Direct Messages</h3>
+            <button onclick="toggleMessages()" class="text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-3 flex-1 overflow-y-auto space-y-3">
+            <div class="flex gap-2">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="w-8 h-8 rounded-full">
+                <div class="bg-gray-100 dark:bg-[#3a3b3c] p-2.5 rounded-2xl text-xs max-w-[80%]">
+                    Hey! Welcome to AS Reebook Social Platform! 🚀
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end">
+                <div class="bg-blue-600 text-white p-2.5 rounded-2xl text-xs max-w-[80%]">
+                    Thanks! Looking great!
+                </div>
+            </div>
+        </div>
+        <div class="p-2 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+            <input type="text" placeholder="Type a message..." class="flex-1 bg-gray-100 dark:bg-[#3a3b3c] px-3 py-1.5 rounded-full text-xs focus:outline-none">
+            <button class="text-blue-600 px-2"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT -->
+    <script>
+        // INITIAL DUMMY DATA FOR AS REEBOOK
+        const initialPosts = [
+            {
+                id: 'post-1',
+                author: 'AS Gaming Official',
+                avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=150&q=80',
+                time: '2 hours ago',
+                content: 'Welcome to AS Reebook! Experience our new social community hub. Post updates, connect with friends, and watch gaming highlights! 🎮🔥',
+                image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
+                video: '',
+                likes: 42,
+                liked: false,
+                comments: [
+                    { name: 'Sarah J.', text: 'Awesome platform UI!' },
+                    { name: 'Alex R.', text: 'Love the blue theme.' }
+                ]
+            },
+            {
+                id: 'post-2',
+                author: 'Elena Rostova',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                time: '5 hours ago',
+                content: 'Check out this awesome gaming setup video clip! 🎬',
+                image: '',
+                video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                likes: 18,
+                liked: false,
+                comments: []
+            }
+        ];
+
+        // LOCAL STORAGE STATE
+        let posts = JSON.parse(localStorage.getItem('as_reebook_posts')) || initialPosts;
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Reset navigation active styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
             });
-            Body.setAngle(segment, angle);
-            Composite.add(world, segment);
 
-            // Add Coins along path
-            if (i % 3 === 0 && i > 5) {
-                const coin = Bodies.circle(midX, midY - 50, 12, {
-                    isStatic: true,
-                    isSensor: true,
-                    render: { fillStyle: '#ffd700' }
-                });
-                coins.push(coin);
-                Composite.add(world, coin);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('border-blue-600', 'text-blue-600');
+                activeNav.classList.remove('border-transparent', 'text-gray-500');
+            }
+
+            if (tabId === 'feed' || tabId === 'profile') {
+                renderPosts();
+            } else if (tabId === 'watch') {
+                renderWatchFeed();
             }
         }
 
-        // Build AS Car
-        const carX = 100, carY = 200;
-        car = Bodies.rectangle(carX, carY, 140, 40, {
-            density: 0.005,
-            friction: 0.4,
-            render: { fillStyle: '#ff5500' } // Orange color theme
-        });
+        // RENDER POSTS TO DOM
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            const profileContainer = document.getElementById('profilePostsContainer');
+            
+            container.innerHTML = '';
+            profileContainer.innerHTML = '';
 
-        // Wheels
-        rearWheel = Bodies.circle(carX - 45, carY + 30, 26, { friction: 0.9, density: 0.01, render: { fillStyle: '#222' } });
-        frontWheel = Bodies.circle(carX + 45, carY + 30, 26, { friction: 0.9, density: 0.01, render: { fillStyle: '#222' } });
+            let userLikesTotal = 0;
+            let userPostsCount = 0;
 
-        // Axles
-        const axle1 = Constraint.create({
-            bodyA: car, pointB: { x: -45, y: 30 }, bodyB: rearWheel, stiffness: 0.4, length: 0
-        });
-        const axle2 = Constraint.create({
-            bodyA: car, pointB: { x: 45, y: 30 }, bodyB: frontWheel, stiffness: 0.4, length: 0
-        });
+            posts.forEach(post => {
+                if (post.author === 'AS Reebook User') {
+                    userPostsCount++;
+                    userLikesTotal += post.likes;
+                }
 
-        Composite.add(world, [car, rearWheel, frontWheel, axle1, axle2]);
-    }
+                const postHTML = createPostCardHTML(post);
+                container.insertAdjacentHTML('beforeend', postHTML);
 
-    function setupInput() {
-        const gasBtn = document.getElementById('btn-gas');
-        const brakeBtn = document.getElementById('btn-brake');
-
-        const bindTouch = (elem, pressFn, releaseFn) => {
-            elem.addEventListener('touchstart', (e) => { e.preventDefault(); pressFn(); });
-            elem.addEventListener('touchend', (e) => { e.preventDefault(); releaseFn(); });
-            elem.addEventListener('mousedown', pressFn);
-            elem.addEventListener('mouseup', releaseFn);
-        };
-
-        bindTouch(gasBtn, () => gasPressed = true, () => gasPressed = false);
-        bindTouch(brakeBtn, () => brakePressed = true, () => brakePressed = false);
-
-        // Custom render for "AS" text on Car Body
-        Events.on(render, 'afterRender', () => {
-            if (!isPlaying || !car) return;
-            const ctx = render.context;
-            const pos = car.position;
-            const angle = car.angle;
-
-            ctx.save();
-            ctx.translate(pos.x, pos.y);
-            ctx.rotate(angle);
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 22px Impact';
-            ctx.fillText('AS', -12, 5);
-            ctx.restore();
-
-            // Camera follow car
-            Render.lookAt(render, car, { x: 300, y: 200 });
-        });
-
-        // Game Loop Updates
-        Events.on(engine, 'beforeUpdate', () => {
-            if (!isPlaying || isGameOver) return;
-
-            if (gasPressed) {
-                Body.setAngularVelocity(rearWheel, 0.25);
-                Body.setAngularVelocity(frontWheel, 0.25);
-            }
-            if (brakePressed) {
-                Body.setAngularVelocity(rearWheel, -0.15);
-                Body.setAngularVelocity(frontWheel, -0.15);
-            }
-
-            // Distance calculation
-            distance = Math.max(0, Math.floor((car.position.x - 100) / 10));
-            document.getElementById('dist-val').innerText = distance;
-
-            // Driver Down Check (Flipped Over)
-            const rot = Math.abs(car.angle % (Math.PI * 2));
-            if ((rot > 1.6 && rot < 4.7) && Math.abs(car.velocity.y) < 0.5) {
-                triggerGameOver();
-            }
-
-            // Coin collection check
-            coins.forEach((coin, idx) => {
-                if (Vector.magnitude(Vector.sub(car.position, coin.position)) < 50) {
-                    Composite.remove(world, coin);
-                    coins.splice(idx, 1);
-                    scoreCoins += 10;
-                    document.getElementById('coin-val').innerText = scoreCoins;
+                if (post.author === 'AS Reebook User') {
+                    profileContainer.insertAdjacentHTML('beforeend', postHTML);
                 }
             });
-        });
-    }
 
-    function startGame() {
-        document.getElementById('main-menu').style.display = 'none';
-        document.getElementById('game-over').style.display = 'none';
-        scoreCoins = 0; distance = 0;
-        isGameOver = false; isPlaying = true;
-        createTerrainAndCar();
-    }
+            document.getElementById('profilePostCount').innerText = userPostsCount;
+            document.getElementById('profileLikesCount').innerText = userLikesTotal;
+        }
 
-    function triggerGameOver() {
-        isGameOver = true;
-        isPlaying = false;
-        document.getElementById('final-dist').innerText = distance;
-        document.getElementById('game-over').style.display = 'flex';
-        document.getElementById('menu-coins').innerText = scoreCoins;
-    }
+        // RENDER WATCH FEED
+        function renderWatchFeed() {
+            const container = document.getElementById('watchContainer');
+            container.innerHTML = '';
 
-    function restartGame() {
-        startGame();
-    }
+            const videoPosts = posts.filter(p => p.video && p.video.trim() !== '');
 
-    window.onload = init;
-</script>
+            if (videoPosts.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-gray-500">No videos available yet. Create one!</div>`;
+                return;
+            }
+
+            videoPosts.forEach(post => {
+                container.insertAdjacentHTML('beforeend', createPostCardHTML(post));
+            });
+        }
+
+        // CREATE SINGLE POST HTML CARD
+        function createPostCardHTML(post) {
+            const commentsList = post.comments.map(c => `
+                <div class="flex gap-2 text-xs bg-gray-100 dark:bg-[#3a3b3c] p-2 rounded-xl">
+                    <span class="font-bold text-gray-800 dark:text-gray-200">${c.name}:</span>
+                    <span class="text-gray-600 dark:text-gray-300">${c.text}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="bg-white dark:bg-[#242526] rounded-xl shadow border border-gray-200 dark:border-gray-700/60 overflow-hidden">
+                    <!-- Post Header -->
+                    <div class="p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${post.avatar}" class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-900 dark:text-gray-100">${post.author}</h4>
+                                <span class="text-xs text-gray-500">${post.time} &bull; <i class="fa-solid fa-earth-americas"></i></span>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+
+                    <!-- Content -->
+                    <p class="px-4 pb-3 text-sm text-gray-800 dark:text-gray-200 leading-relaxed">${post.content}</p>
+
+                    <!-- Media Render -->
+                    ${post.image ? `<img src="${post.image}" class="w-full max-h-96 object-cover">` : ''}
+                    ${post.video ? `
+                        <div class="relative bg-black">
+                            <video controls class="w-full max-h-96">
+                                <source src="${post.video}" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    ` : ''}
+
+                    <!-- Post Stats -->
+                    <div class="px-4 py-2 flex justify-between text-xs text-gray-500 border-b border-gray-100 dark:border-gray-700/60">
+                        <span><i class="fa-solid fa-thumbs-up text-blue-500"></i> ${post.likes} Likes</span>
+                        <span>${post.comments.length} Comments</span>
+                    </div>
+
+                    <!-- Post Actions -->
+                    <div class="flex justify-around py-1 border-b border-gray-100 dark:border-gray-700/60 text-sm">
+                        <button onclick="toggleLike('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] font-semibold ${post.liked ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'} transition">
+                            <i class="fa-solid fa-thumbs-up"></i> Like
+                        </button>
+                        <button onclick="focusCommentInput('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] text-gray-600 dark:text-gray-300 font-semibold transition">
+                            <i class="fa-solid fa-comment"></i> Comment
+                        </button>
+                        <button onclick="sharePost('${post.id}')" class="flex-1 py-2 flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3a3b3c] text-gray-600 dark:text-gray-300 font-semibold transition">
+                            <i class="fa-solid fa-share"></i> Share
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="p-3 bg-gray-50 dark:bg-[#2a2b2c] space-y-2">
+                        <div id="comments-list-${post.id}" class="space-y-1.5">
+                            ${commentsList}
+                        </div>
+                        <div class="flex items-center gap-2 pt-2">
+                            <input id="input-comment-${post.id}" type="text" placeholder="Write a comment..." 
+                                class="flex-1 bg-white dark:bg-[#3a3b3c] text-xs px-3 py-2 rounded-full border border-gray-200 dark:border-gray-600 focus:outline-none">
+                            <button onclick="addComment('${post.id}')" class="text-blue-600 text-sm font-bold px-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // CREATE NEW POST MODAL CONTROLS
+        function openCreatePostModal(type = 'text') {
+            document.getElementById('createPostModal').classList.remove('hidden');
+        }
+
+        function closeCreatePostModal() {
+            document.getElementById('createPostModal').classList.add('hidden');
+            document.getElementById('postText').value = '';
+            document.getElementById('postImageURL').value = '';
+            document.getElementById('postVideoURL').value = '';
+        }
+
+        function submitNewPost() {
+            const text = document.getElementById('postText').value.trim();
+            const image = document.getElementById('postImageURL').value.trim();
+            const video = document.getElementById('postVideoURL').value.trim();
+
+            if (!text && !image && !video) {
+                alert('Please add text or media to post!');
+                return;
+            }
+
+            const newPost = {
+                id: 'post-' + Date.now(),
+                author: 'AS Reebook User',
+                avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+                time: 'Just now',
+                content: text,
+                image: image,
+                video: video,
+                likes: 0,
+                liked: false,
+                comments: []
+            };
+
+            posts.unshift(newPost);
+            savePostsState();
+            closeCreatePostModal();
+            renderPosts();
+        }
+
+        // POST INTERACTION FUNCTIONS
+        function toggleLike(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.liked = !post.liked;
+                post.likes += post.liked ? 1 : -1;
+                savePostsState();
+                renderPosts();
+            }
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`input-comment-${postId}`);
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push({ name: 'AS Reebook User', text: text });
+                savePostsState();
+                renderPosts();
+            }
+        }
+
+        function focusCommentInput(postId) {
+            const input = document.getElementById(`input-comment-${postId}`);
+            if (input) input.focus();
+        }
+
+        function sharePost(postId) {
+            alert('Post shared to your AS Reebook timeline!');
+        }
+
+        function savePostsState() {
+            localStorage.setItem('as_reebook_posts', JSON.stringify(posts));
+        }
+
+        // DARK MODE TOGGLE
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('darkModeIcon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = 'fa-solid fa-sun text-yellow-400';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // MESSAGES TOGGLE
+        function toggleMessages() {
+            const overlay = document.getElementById('messagesOverlay');
+            overlay.classList.toggle('hidden');
+        }
+
+        // INITIALIZE APP ON LOAD
+        window.onload = function() {
+            renderPosts();
+        };
+    </script>
 </body>
 </html>
+```
