@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AS Reebook - Facebook Clone</title>
+    <title>AS Reebook - Realtime App</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f0f2f5; color: #1c1e21; }
 
-        /* Auth Container */
+        /* Auth Screen */
         .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
         .auth-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
         .auth-card h2 { color: #1877f2; font-size: 32px; margin-bottom: 10px; font-weight: bold; }
@@ -16,7 +16,7 @@
         .auth-card button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .switch-link { color: #1877f2; font-size: 14px; margin-top: 15px; cursor: pointer; display: block; }
 
-        /* App Layout */
+        /* Main App Screen Layout */
         #app-screen { display: none; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         header { background: white; border-bottom: 1px solid #e4e6eb; padding: 10px 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: #1877f2; font-size: 24px; font-weight: bold; }
@@ -28,7 +28,7 @@
         .tab-content { display: none; padding-bottom: 50px; }
         .tab-content.active { display: block; }
 
-        /* Profile Styles */
+        /* Profile Elements */
         .profile-header { position: relative; background: #e4e6eb; }
         .cover-photo { width: 100%; height: 180px; object-fit: cover; background: #ccc; }
         .profile-pic-container { position: absolute; bottom: -40px; left: 20px; }
@@ -37,21 +37,22 @@
         .profile-name { font-size: 22px; font-weight: bold; }
         .profile-bio { color: #65676b; margin: 5px 0; font-size: 14px; }
         .profile-rel { font-weight: 600; color: #1877f2; font-size: 13px; margin-bottom: 10px; }
-        .edit-profile-btn { background: #e4e6eb; color: black; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .edit-profile-btn { background: #e4e6eb; color: black; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Story Section */
+        /* Story Bar */
         .story-container { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: white; border-bottom: 8px solid #f0f2f5; }
         .story-box { width: 95px; height: 150px; border-radius: 10px; background: #222; position: relative; flex-shrink: 0; overflow: hidden; display: flex; align-items: flex-end; padding: 8px; font-size: 12px; font-weight: bold; color: white; }
-        .story-box media, .story-box img, .story-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .story-box img, .story-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
         .story-box.add-story { background: #e7f3ff; color: #1877f2; justify-content: center; align-items: center; text-align: center; cursor: pointer; border: 1px dashed #1877f2; }
 
-        /* Feed Posts */
+        /* Post Creation */
         .create-post { padding: 15px; background: white; border-bottom: 8px solid #f0f2f5; }
         .create-post textarea { width: 100%; border: none; resize: none; font-size: 16px; outline: none; margin-bottom: 10px; }
         .post-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e4e6eb; padding-top: 10px; }
         .file-btn { color: #45bd62; font-weight: bold; font-size: 14px; cursor: pointer; }
         .post-submit-btn { background: #1877f2; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
+        /* Feed Posts Card */
         .post-card { background: white; border-bottom: 8px solid #f0f2f5; padding-top: 12px; }
         .post-header { display: flex; align-items: center; padding: 0 12px 10px; }
         .avatar { width: 40px; height: 40px; background: #1877f2; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 10px; overflow: hidden; }
@@ -64,23 +65,25 @@
         
         /* Reaction Bar */
         .post-buttons { display: flex; justify-content: space-around; padding: 5px 0; border-bottom: 1px solid #e4e6eb; }
-        .reaction-popover { display: flex; gap: 8px; background: white; padding: 5px 10px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .reaction-popover { display: flex; gap: 8px; background: white; padding: 5px 10px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .react-btn { font-size: 18px; cursor: pointer; transition: transform 0.2s; }
         .react-btn:hover { transform: scale(1.3); }
 
-        /* Comments Section */
+        /* Comments */
         .comments-section { padding: 10px 12px; background: #f8f9fa; }
         .comment-item { font-size: 13px; margin-bottom: 6px; background: #e4e6eb; padding: 6px 10px; border-radius: 12px; width: fit-content; }
         .comment-input-box { display: flex; gap: 5px; margin-top: 8px; }
         .comment-input-box input { flex: 1; padding: 6px 12px; border: 1px solid #ddd; border-radius: 15px; outline: none; font-size: 13px; }
         .comment-input-box button { background: #1877f2; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        /* Friends & Messenger List */
+        /* Search & Lists */
+        .search-box { padding: 10px 12px; }
+        .search-box input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e4e6eb; }
         .btn-small { background: #1877f2; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-secondary { background: #e4e6eb; color: black; }
 
-        /* Messenger Window */
+        /* Messenger Box */
         #chat-window { display: none; flex-direction: column; height: 80vh; }
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; background: #f0f2f5; }
         .chat-body { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
@@ -90,15 +93,14 @@
         .chat-footer { display: flex; padding: 10px; border-top: 1px solid #ddd; }
         .chat-footer input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
 
-        /* Call Modal Overlay */
+        /* Call Modal */
         #call-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); color:white; z-index:1000; flex-direction:column; justify-content:center; align-items:center; }
     </style>
 </head>
 <body>
 
-    <!-- Auth Section -->
+    <!-- Authentication Screen -->
     <div id="auth-screen" class="auth-container">
-        <!-- Sign Up Form -->
         <div id="register-card" class="auth-card">
             <h2>AS Reebook</h2>
             <p style="margin-bottom:15px; color:#65676b;">Create a new account</p>
@@ -109,7 +111,6 @@
             <span class="switch-link" onclick="toggleAuth(true)">Already have an account? Log In</span>
         </div>
 
-        <!-- Login Form -->
         <div id="login-card" class="auth-card" style="display:none;">
             <h2>AS Reebook</h2>
             <p style="margin-bottom:15px; color:#65676b;">Log In to AS Reebook</p>
@@ -120,14 +121,14 @@
         </div>
     </div>
 
-    <!-- Main App Section -->
+    <!-- Main Application Screen -->
     <div id="app-screen">
         <header>
             <h1>AS Reebook</h1>
             <button onclick="logout()" style="border:none; background:none; color:#1877f2; font-weight:bold; cursor:pointer;">Log Out</button>
         </header>
 
-        <!-- Navigation Tabs -->
+        <!-- Nav Tabs -->
         <div class="nav-tabs">
             <div class="nav-tab active" onclick="switchTab('feed', this)">🏠</div>
             <div class="nav-tab" onclick="switchTab('friends', this)">👥</div>
@@ -137,7 +138,7 @@
 
         <!-- Feed Tab -->
         <div id="tab-feed" class="tab-content active">
-            <!-- Story Container -->
+            <!-- Stories -->
             <div class="story-container" id="story-list">
                 <label class="story-box add-story">
                     +<br>Add Story
@@ -145,7 +146,7 @@
                 </label>
             </div>
 
-            <!-- Create Post -->
+            <!-- Post Creation -->
             <div class="create-post">
                 <textarea id="post-text" rows="2" placeholder="What's on your mind?"></textarea>
                 <div class="post-actions">
@@ -158,13 +159,16 @@
                 </div>
             </div>
 
-            <!-- Feed Posts -->
+            <!-- Feed Post List -->
             <div id="feed-posts"></div>
         </div>
 
-        <!-- Friends Tab -->
+        <!-- Friends Tab & Search -->
         <div id="tab-friends" class="tab-content">
-            <h3 style="padding:12px; color:#1877f2;">People You May Know</h3>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search friends by name..." onkeyup="searchFriends()">
+            </div>
+            <h3 style="padding:10px 12px; color:#1877f2; font-size:16px;">Users on AS Reebook</h3>
             <div id="friends-list"></div>
         </div>
 
@@ -203,10 +207,8 @@
                 <button class="edit-profile-btn" onclick="openEditProfile()">Edit Profile</button>
             </div>
 
-            <!-- Profile Edit Form (Hidden) -->
             <div id="edit-profile-box" style="display:none; padding:15px; background:#f8f9fa; border-bottom:8px solid #f0f2f5;">
-                <h4>Edit Profile Info</h4>
-                <br>
+                <h4>Edit Profile Details</h4><br>
                 <label style="font-size:12px;">Profile Picture:</label>
                 <input type="file" id="upload-profile-pic" accept="image/*" style="margin-bottom:10px;"><br>
                 <label style="font-size:12px;">Cover Photo:</label>
@@ -221,24 +223,51 @@
                 <button class="btn-small" onclick="saveProfileDetails()">Save Changes</button>
             </div>
 
-            <div style="padding:15px;">
-                <h3>Your Posts</h3>
-            </div>
+            <div style="padding:15px;"><h3>Your Posts</h3></div>
             <div id="my-posts"></div>
         </div>
     </div>
 
-    <!-- Call Overlay -->
+    <!-- Calling Overlay -->
     <div id="call-modal">
         <h2 id="call-type-title">Calling...</h2>
         <p id="call-user-display" style="margin: 15px 0;"></p>
         <button class="btn-small" style="background:#dc3545; padding:10px 20px;" onclick="endCall()">End Call</button>
     </div>
 
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVrjndydq5jgncUsru3L4Lia...", // Added from your image
+            authDomain: "as-reebook.firebaseapp.com",
+            projectId: "as-reebook",
+            storageBucket: "as-reebook.firebasestorage.app",
+            messagingSenderId: "273667897324",
+            appId: "1:273667897324:web:75a105684df7...",
+            measurementId: "G-XCEC30M3BC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbUpdate = update;
+    </script>
+
     <script>
         let currentUser = null;
         let activeChatFriend = null;
         let selectedMediaData = { url: '', type: '' };
+        let allUsers = {};
 
         function toggleAuth(isLogin) {
             document.getElementById('register-card').style.display = isLogin ? 'none' : 'block';
@@ -250,34 +279,66 @@
             const phone = document.getElementById('reg-phone').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
 
-            if(!name || !phone || !pass) return alert("Please fill in all fields!");
+            if(!name || !phone || !pass) return alert("Please fill all information!");
 
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            if(users.some(u => u.phone === phone)) return alert("Account already exists with this number!");
-
-            users.push({ name, phone, pass, bio: '', relationship: 'Single', avatar: '', cover: '', friends: [] });
-            localStorage.setItem('fb_users', JSON.stringify(users));
-            alert("Registration successful! Please log in.");
-            toggleAuth(true);
+            const userRef = window.dbRef(window.db, 'users/' + phone);
+            window.dbSet(userRef, {
+                name: name,
+                phone: phone,
+                pass: pass,
+                bio: '',
+                relationship: 'Single',
+                avatar: '',
+                cover: '',
+                friends: {}
+            }).then(() => {
+                alert("Account created successfully! Please Log In.");
+                toggleAuth(true);
+            }).catch(e => alert("Error: " + e.message));
         }
 
         function handleLogin() {
             const phone = document.getElementById('login-phone').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
 
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            let user = users.find(u => u.phone === phone && u.pass === pass);
-
-            if(!user) return alert("Invalid phone number or password!");
-
-            currentUser = user;
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
-            loadFeed();
-            loadProfile();
+            const userRef = window.dbRef(window.db, 'users/' + phone);
+            window.dbOnValue(userRef, (snapshot) => {
+                const user = snapshot.val();
+                if(user && user.pass === pass) {
+                    currentUser = user;
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('app-screen').style.display = 'block';
+                    initRealtimeListeners();
+                } else {
+                    alert("Invalid Mobile Number or Password!");
+                }
+            }, { onlyOnce: true });
         }
 
         function logout() { location.reload(); }
+
+        function initRealtimeListeners() {
+            // Listen to All Users
+            window.dbOnValue(window.dbRef(window.db, 'users'), (snapshot) => {
+                allUsers = snapshot.val() || {};
+                loadFriends();
+                loadMessenger();
+            });
+
+            // Listen to Feed Posts
+            window.dbOnValue(window.dbRef(window.db, 'posts'), (snapshot) => {
+                const postsData = snapshot.val() || {};
+                renderPosts(postsData);
+            });
+
+            // Listen to Stories
+            window.dbOnValue(window.dbRef(window.db, 'stories'), (snapshot) => {
+                const storiesData = snapshot.val() || {};
+                renderStories(storiesData);
+            });
+
+            loadProfile();
+        }
 
         function switchTab(tabName, element) {
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -285,11 +346,6 @@
 
             element.classList.add('active');
             document.getElementById('tab-' + tabName).classList.add('active');
-
-            if(tabName === 'feed') loadFeed();
-            if(tabName === 'friends') loadFriends();
-            if(tabName === 'messenger') loadMessenger();
-            if(tabName === 'profile') loadProfile();
         }
 
         /* Profile Functions */
@@ -308,8 +364,6 @@
             if(currentUser.cover) {
                 document.getElementById('cover-img').src = currentUser.cover;
             }
-
-            loadMyPosts();
         }
 
         function openEditProfile() {
@@ -323,65 +377,62 @@
             const picFile = document.getElementById('upload-profile-pic').files[0];
             const coverFile = document.getElementById('upload-cover-pic').files[0];
 
-            if(bio) currentUser.bio = bio;
-            currentUser.relationship = rel;
+            let updates = {};
+            if(bio) updates.bio = bio;
+            updates.relationship = rel;
 
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            let userIndex = users.findIndex(u => u.phone === currentUser.phone);
-
-            const updateStorage = () => {
-                if(userIndex !== -1) users[userIndex] = currentUser;
-                localStorage.setItem('fb_users', JSON.stringify(users));
-                loadProfile();
-                document.getElementById('edit-profile-box').style.display = 'none';
-                alert("Profile Updated Successfully!");
+            const applyUpdates = () => {
+                window.dbUpdate(window.dbRef(window.db, 'users/' + currentUser.phone), updates).then(() => {
+                    currentUser = { ...currentUser, ...updates };
+                    loadProfile();
+                    document.getElementById('edit-profile-box').style.display = 'none';
+                    alert("Profile Updated Successfully!");
+                });
             };
 
             if(picFile) {
                 const reader = new FileReader();
-                reader.onload = function(e) { currentUser.avatar = e.target.result; if(!coverFile) updateStorage(); };
+                reader.onload = (e) => { updates.avatar = e.target.result; if(!coverFile) applyUpdates(); };
                 reader.readAsDataURL(picFile);
             }
             if(coverFile) {
                 const reader2 = new FileReader();
-                reader2.onload = function(e) { currentUser.cover = e.target.result; updateStorage(); };
+                reader2.onload = (e) => { updates.cover = e.target.result; applyUpdates(); };
                 reader2.readAsDataURL(coverFile);
             }
-            if(!picFile && !coverFile) updateStorage();
+            if(!picFile && !coverFile) applyUpdates();
         }
 
-        /* Story Upload */
+        /* Stories */
         function uploadStory(input) {
             const file = input.files[0];
             if(!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                let stories = JSON.parse(localStorage.getItem('fb_stories') || "[]");
-                stories.unshift({
+                const newStoryRef = window.dbPush(window.dbRef(window.db, 'stories'));
+                window.dbSet(newStoryRef, {
                     author: currentUser.name,
                     media: e.target.result,
                     type: file.type.startsWith('video') ? 'video' : 'image'
                 });
-                localStorage.setItem('fb_stories', JSON.stringify(stories));
-                loadStories();
             };
             reader.readAsDataURL(file);
         }
 
-        function loadStories() {
-            let stories = JSON.parse(localStorage.getItem('fb_stories') || "[]");
+        function renderStories(storiesData) {
             let container = document.getElementById('story-list');
             let baseHtml = `<label class="story-box add-story">+<br>Add Story<input type="file" id="story-file" accept="image/*,video/*" style="display:none;" onchange="uploadStory(this)"></label>`;
             
-            stories.forEach(s => {
+            Object.keys(storiesData).reverse().forEach(key => {
+                let s = storiesData[key];
                 let mediaTag = s.type === 'video' ? `<video src="${s.media}" autoplay loop muted></video>` : `<img src="${s.media}">`;
                 baseHtml += `<div class="story-box">${mediaTag}<span style="position:relative; z-index:2;">${s.author}</span></div>`;
             });
             container.innerHTML = baseHtml;
         }
 
-        /* Post & Reactions */
+        /* Posts & Feed */
         function handleFileSelect() {
             const file = document.getElementById('post-file').files[0];
             if(file) {
@@ -397,56 +448,48 @@
 
         function submitPost() {
             const text = document.getElementById('post-text').value.trim();
-            if(!text && !selectedMediaData.url) return alert("Write something or select a file!");
+            if(!text && !selectedMediaData.url) return alert("Write something or select a photo/video!");
 
-            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
-            posts.unshift({
-                id: Date.now(),
+            const newPostRef = window.dbPush(window.dbRef(window.db, 'posts'));
+            window.dbSet(newPostRef, {
                 authorPhone: currentUser.phone,
                 author: currentUser.name,
                 authorAvatar: currentUser.avatar || '',
                 text: text,
                 media: selectedMediaData.url,
                 mediaType: selectedMediaData.type,
-                reactions: { '👍': 0, '❤️': 0, '🥰': 0, '😆': 0, '😮': 0, '😢': 0, '😡': 0 },
+                reactions: { '👍': 0 },
                 comments: []
+            }).then(() => {
+                document.getElementById('post-text').value = '';
+                document.getElementById('post-file').value = '';
+                document.getElementById('file-indicator').innerText = '';
+                selectedMediaData = { url: '', type: '' };
             });
-            localStorage.setItem('fb_posts', JSON.stringify(posts));
-
-            document.getElementById('post-text').value = '';
-            document.getElementById('post-file').value = '';
-            document.getElementById('file-indicator').innerText = '';
-            selectedMediaData = { url: '', type: '' };
-            loadFeed();
         }
 
-        function loadFeed() {
-            loadStories();
-            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
-            renderPosts(posts, 'feed-posts');
-        }
+        function renderPosts(postsData) {
+            let feedHtml = '';
+            let myPostsHtml = '';
 
-        function loadMyPosts() {
-            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
-            let myPosts = posts.filter(p => p.authorPhone === currentUser.phone);
-            renderPosts(myPosts, 'my-posts');
-        }
-
-        function renderPosts(posts, containerId) {
-            let html = '';
-            posts.forEach(p => {
+            Object.keys(postsData).reverse().forEach(postId => {
+                let p = postsData[postId];
                 let mediaTag = p.media ? (p.mediaType === 'video' ? `<video src="${p.media}" controls class="post-media"></video>` : `<img src="${p.media}" class="post-media">`) : '';
                 let avatarTag = p.authorAvatar ? `<img src="${p.authorAvatar}">` : p.author.charAt(0).toUpperCase();
 
-                let reactionSum = 0;
-                for(let r in p.reactions) reactionSum += p.reactions[r];
+                let totalReactions = 0;
+                if(p.reactions) {
+                    Object.values(p.reactions).forEach(count => totalReactions += count);
+                }
 
                 let commentsHtml = '';
-                (p.comments || []).forEach(c => {
-                    commentsHtml += `<div class="comment-item"><strong>${c.user}:</strong> ${c.text}</div>`;
-                });
+                if(p.comments) {
+                    Object.values(p.comments).forEach(c => {
+                        commentsHtml += `<div class="comment-item"><strong>${c.user}:</strong> ${c.text}</div>`;
+                    });
+                }
 
-                html += `
+                let cardHtml = `
                     <div class="post-card">
                         <div class="post-header">
                             <div class="avatar">${avatarTag}</div>
@@ -457,156 +500,101 @@
                         </div>
                         <div class="post-text">${p.text}</div>
                         ${mediaTag}
-                        <div class="post-stats"><span>Reactions: ${reactionSum}</span><span>${(p.comments || []).length} Comments</span></div>
+                        <div class="post-stats"><span>Reactions: ${totalReactions}</span><span>${p.comments ? Object.keys(p.comments).length : 0} Comments</span></div>
                         <div class="post-buttons">
                             <div class="reaction-popover">
-                                <span class="react-btn" onclick="reactPost(${p.id}, '👍')">👍</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '❤️')">❤️</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '🥰')">🥰</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '😆')">😆</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '😮')">😮</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '😢')">😢</span>
-                                <span class="react-btn" onclick="reactPost(${p.id}, '😡')">😡</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '👍')">👍</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '❤️')">❤️</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '🥰')">🥰</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '😆')">😆</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '😮')">😮</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '😢')">😢</span>
+                                <span class="react-btn" onclick="reactPost('${postId}', '😡')">😡</span>
                             </div>
                         </div>
                         <div class="comments-section">
                             ${commentsHtml}
                             <div class="comment-input-box">
-                                <input type="text" id="comment-input-${p.id}" placeholder="Write a comment...">
-                                <button onclick="addComment(${p.id})">Comment</button>
+                                <input type="text" id="comment-input-${postId}" placeholder="Write a comment...">
+                                <button onclick="addComment('${postId}')">Comment</button>
                             </div>
                         </div>
                     </div>
                 `;
+
+                feedHtml += cardHtml;
+                if(p.authorPhone === currentUser.phone) myPostsHtml += cardHtml;
             });
-            document.getElementById(containerId).innerHTML = html || '<p style="text-align:center; padding:20px; color:#65676b;">No posts available!</p>';
+
+            document.getElementById('feed-posts').innerHTML = feedHtml || '<p style="text-align:center; padding:20px; color:#65676b;">No posts yet!</p>';
+            document.getElementById('my-posts').innerHTML = myPostsHtml || '<p style="text-align:center; padding:20px; color:#65676b;">No posts by you!</p>';
         }
 
-        function reactPost(id, type) {
-            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
-            let post = posts.find(p => p.id === id);
-            if(post) {
-                if(!post.reactions) post.reactions = { '👍': 0, '❤️': 0, '🥰': 0, '😆': 0, '😮': 0, '😢': 0, '😡': 0 };
-                post.reactions[type] = (post.reactions[type] || 0) + 1;
-                localStorage.setItem('fb_posts', JSON.stringify(posts));
-                loadFeed();
-            }
+        function reactPost(postId, type) {
+            const reactRef = window.dbRef(window.db, `posts/${postId}/reactions/${type}`);
+            window.dbOnValue(reactRef, (snapshot) => {
+                let currentVal = snapshot.val() || 0;
+                window.dbSet(reactRef, currentVal + 1);
+            }, { onlyOnce: true });
         }
 
-        function addComment(id) {
-            let input = document.getElementById('comment-input-' + id);
+        function addComment(postId) {
+            let input = document.getElementById('comment-input-' + postId);
             let text = input.value.trim();
             if(!text) return;
 
-            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
-            let post = posts.find(p => p.id === id);
-            if(post) {
-                if(!post.comments) post.comments = [];
-                post.comments.push({ user: currentUser.name, text: text });
-                localStorage.setItem('fb_posts', JSON.stringify(posts));
-                loadFeed();
-            }
+            const commentsRef = window.dbPush(window.dbRef(window.db, `posts/${postId}/comments`));
+            window.dbSet(commentsRef, { user: currentUser.name, text: text }).then(() => {
+                input.value = '';
+            });
         }
 
-        /* Friends System */
-        function loadFriends() {
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
+        /* Search & Friends */
+        function loadFriends(filterText = '') {
             let html = '';
-            users.forEach(u => {
-                if(u.phone !== currentUser.phone) {
-                    let isFriend = (currentUser.friends || []).includes(u.phone);
-                    let btnText = isFriend ? "Cancel Request" : "Add Friend";
-                    let btnClass = isFriend ? "btn-small btn-secondary" : "btn-small";
-                    html += `
-                        <div class="list-item">
-                            <div><strong>${u.name}</strong></div>
-                            <button class="${btnClass}" onclick="toggleFriendRequest('${u.phone}')">${btnText}</button>
-                        </div>
-                    `;
+            Object.keys(allUsers).forEach(phone => {
+                let u = allUsers[phone];
+                if(phone !== currentUser.phone) {
+                    if(!filterText || u.name.toLowerCase().includes(filterText.toLowerCase())) {
+                        let isFriend = currentUser.friends && currentUser.friends[phone];
+                        let btnText = isFriend ? "Cancel Request" : "Add Friend";
+                        let btnClass = isFriend ? "btn-small btn-secondary" : "btn-small";
+                        html += `
+                            <div class="list-item">
+                                <div><strong>${u.name}</strong><br><span style="font-size:12px; color:#65676b;">${u.phone}</span></div>
+                                <button class="${btnClass}" onclick="toggleFriendRequest('${u.phone}')">${btnText}</button>
+                            </div>
+                        `;
+                    }
                 }
             });
-            document.getElementById('friends-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">No other users found.</p>';
+            document.getElementById('friends-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">No users found.</p>';
+        }
+
+        function searchFriends() {
+            let text = document.getElementById('search-input').value.trim();
+            loadFriends(text);
         }
 
         function toggleFriendRequest(phone) {
-            if(!currentUser.friends) currentUser.friends = [];
-            let index = currentUser.friends.indexOf(phone);
-            if(index === -1) {
-                currentUser.friends.push(phone);
-                alert("Friend Request Sent!");
+            const friendRef = window.dbRef(window.db, `users/${currentUser.phone}/friends/${phone}`);
+            if(currentUser.friends && currentUser.friends[phone]) {
+                window.dbSet(friendRef, null);
+                delete currentUser.friends[phone];
+                alert("Request Cancelled!");
             } else {
-                currentUser.friends.splice(index, 1);
-                alert("Friend Request Cancelled!");
+                window.dbSet(friendRef, true);
+                if(!currentUser.friends) currentUser.friends = {};
+                currentUser.friends[phone] = true;
+                alert("Friend Request Sent!");
             }
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            let uIndex = users.findIndex(u => u.phone === currentUser.phone);
-            if(uIndex !== -1) users[uIndex] = currentUser;
-            localStorage.setItem('fb_users', JSON.stringify(users));
             loadFriends();
         }
 
-        /* Messenger Functions */
+        /* Realtime Messenger */
         function loadMessenger() {
-            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
             let html = '';
-            users.forEach(u => {
-                if(u.phone !== currentUser.phone) {
-                    html += `
-                        <div class="list-item">
-                            <div><strong>${u.name}</strong></div>
-                            <button class="btn-small" onclick="openChat('${u.phone}', '${u.name}')">Message</button>
-                        </div>
-                    `;
-                }
-            });
-            document.getElementById('messenger-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">No other users found.</p>';
-        }
-
-        function openChat(phone, name) {
-            activeChatFriend = { phone, name };
-            document.getElementById('messenger-list').style.display = 'none';
-            document.getElementById('chat-window').style.display = 'flex';
-            document.getElementById('chat-user-name').innerText = name;
-            loadMessages();
-        }
-
-        function closeChat() {
-            document.getElementById('chat-window').style.display = 'none';
-            document.getElementById('messenger-list').style.display = 'block';
-        }
-
-        function sendMessage() {
-            let text = document.getElementById('chat-input').value.trim();
-            if(!text) return;
-
-            let msgs = JSON.parse(localStorage.getItem('fb_msgs') || "[]");
-            msgs.push({ sender: currentUser.phone, receiver: activeChatFriend.phone, text });
-            localStorage.setItem('fb_msgs', JSON.stringify(msgs));
-
-            document.getElementById('chat-input').value = '';
-            loadMessages();
-        }
-
-        function loadMessages() {
-            let msgs = JSON.parse(localStorage.getItem('fb_msgs') || "[]");
-            let html = '';
-            msgs.forEach(m => {
-                if((m.sender === currentUser.phone && m.receiver === activeChatFriend.phone) ||
-                   (m.sender === activeChatFriend.phone && m.receiver === currentUser.phone)) {
-                    let cls = m.sender === currentUser.phone ? 'sent' : 'received';
-                    html += `<div class="msg ${cls}">${m.text}</div>`;
-                }
-            });
-            document.getElementById('chat-body').innerHTML = html;
-        }
-
-        function startCall(type) {
-            document.getElementById('call-type-title').innerText = type + " Calling...";
-            document.getElementById('call-user-display').innerText = activeChatFriend.name;
-            document.getElementById('call-modal').style.display = 'flex';
-        }
-
-        function endCall() { document.getElementById('call-modal').style.display = 'none'; }
-    </script>
-</body>
-</html>
+            Object.keys(allUsers).forEach(phone => {
+                let u = allUsers[phone];
+                if(phone !== currentUser.phone) {
+                    html
