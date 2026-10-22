@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AS Reebook - Facebook Style App</title>
+    <title>AS Reebook - Facebook Clone</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f0f2f5; color: #1c1e21; }
@@ -12,11 +12,11 @@
         .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f2f5; }
         .auth-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
         .auth-card h2 { color: #1877f2; font-size: 32px; margin-bottom: 10px; font-weight: bold; }
-        .auth-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; outline: none; }
+        .auth-card input, .auth-card select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 15px; outline: none; }
         .auth-card button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .switch-link { color: #1877f2; font-size: 14px; margin-top: 15px; cursor: pointer; display: block; }
 
-        /* App Screen Layout */
+        /* App Layout */
         #app-screen { display: none; max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         header { background: white; border-bottom: 1px solid #e4e6eb; padding: 10px 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: #1877f2; font-size: 24px; font-weight: bold; }
@@ -28,35 +28,59 @@
         .tab-content { display: none; padding-bottom: 50px; }
         .tab-content.active { display: block; }
 
+        /* Profile Styles */
+        .profile-header { position: relative; background: #e4e6eb; }
+        .cover-photo { width: 100%; height: 180px; object-fit: cover; background: #ccc; }
+        .profile-pic-container { position: absolute; bottom: -40px; left: 20px; }
+        .profile-pic { width: 90px; height: 90px; border-radius: 50%; border: 4px solid white; object-fit: cover; background: #1877f2; color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; }
+        .profile-details { padding: 50px 20px 15px; border-bottom: 8px solid #f0f2f5; }
+        .profile-name { font-size: 22px; font-weight: bold; }
+        .profile-bio { color: #65676b; margin: 5px 0; font-size: 14px; }
+        .profile-rel { font-weight: 600; color: #1877f2; font-size: 13px; margin-bottom: 10px; }
+        .edit-profile-btn { background: #e4e6eb; color: black; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
         /* Story Section */
         .story-container { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: white; border-bottom: 8px solid #f0f2f5; }
-        .story-box { width: 90px; height: 140px; border-radius: 10px; background: #1877f2; position: relative; flex-shrink: 0; overflow: hidden; display: flex; align-items: flex-end; padding: 8px; font-size: 12px; font-weight: bold; color: white; }
+        .story-box { width: 95px; height: 150px; border-radius: 10px; background: #222; position: relative; flex-shrink: 0; overflow: hidden; display: flex; align-items: flex-end; padding: 8px; font-size: 12px; font-weight: bold; color: white; }
+        .story-box media, .story-box img, .story-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
         .story-box.add-story { background: #e7f3ff; color: #1877f2; justify-content: center; align-items: center; text-align: center; cursor: pointer; border: 1px dashed #1877f2; }
 
-        /* Post Creation Area */
+        /* Feed Posts */
         .create-post { padding: 15px; background: white; border-bottom: 8px solid #f0f2f5; }
         .create-post textarea { width: 100%; border: none; resize: none; font-size: 16px; outline: none; margin-bottom: 10px; }
         .post-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e4e6eb; padding-top: 10px; }
         .file-btn { color: #45bd62; font-weight: bold; font-size: 14px; cursor: pointer; }
         .post-submit-btn { background: #1877f2; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* Feed Posts */
         .post-card { background: white; border-bottom: 8px solid #f0f2f5; padding-top: 12px; }
         .post-header { display: flex; align-items: center; padding: 0 12px 10px; }
-        .avatar { width: 40px; height: 40px; background: #1877f2; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 10px; }
+        .avatar { width: 40px; height: 40px; background: #1877f2; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 10px; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .post-author { font-weight: bold; font-size: 15px; }
         .post-time { font-size: 12px; color: #65676b; }
         .post-text { padding: 0 12px 10px; font-size: 15px; line-height: 1.4; }
         .post-media { width: 100%; max-height: 400px; object-fit: cover; }
         .post-stats { display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #e4e6eb; font-size: 13px; color: #65676b; }
-        .post-buttons { display: flex; justify-content: space-around; padding: 5px 0; }
-        .post-btn-action { color: #65676b; font-weight: 600; font-size: 14px; cursor: pointer; border: none; background: none; }
+        
+        /* Reaction Bar */
+        .post-buttons { display: flex; justify-content: space-around; padding: 5px 0; border-bottom: 1px solid #e4e6eb; }
+        .reaction-popover { display: flex; gap: 8px; background: white; padding: 5px 10px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .react-btn { font-size: 18px; cursor: pointer; transition: transform 0.2s; }
+        .react-btn:hover { transform: scale(1.3); }
+
+        /* Comments Section */
+        .comments-section { padding: 10px 12px; background: #f8f9fa; }
+        .comment-item { font-size: 13px; margin-bottom: 6px; background: #e4e6eb; padding: 6px 10px; border-radius: 12px; width: fit-content; }
+        .comment-input-box { display: flex; gap: 5px; margin-top: 8px; }
+        .comment-input-box input { flex: 1; padding: 6px 12px; border: 1px solid #ddd; border-radius: 15px; outline: none; font-size: 13px; }
+        .comment-input-box button { background: #1877f2; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
         /* Friends & Messenger List */
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e4e6eb; }
         .btn-small { background: #1877f2; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-secondary { background: #e4e6eb; color: black; }
 
-        /* Messenger Box */
+        /* Messenger Window */
         #chat-window { display: none; flex-direction: column; height: 80vh; }
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; background: #f0f2f5; }
         .chat-body { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
@@ -77,22 +101,22 @@
         <!-- Sign Up Form -->
         <div id="register-card" class="auth-card">
             <h2>AS Reebook</h2>
-            <p style="margin-bottom:15px; color:#65676b;">নতুন অ্যাকাউন্ট তৈরি করুন</p>
-            <input type="text" id="reg-name" placeholder="আপনার পূর্ণ নাম">
-            <input type="text" id="reg-phone" placeholder="মোবাইল নম্বর">
-            <input type="password" id="reg-pass" placeholder="পাসওয়ার্ড">
-            <button onclick="handleRegister()">সাইন-আপ করুন</button>
-            <span class="switch-link" onclick="toggleAuth(true)">আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন</span>
+            <p style="margin-bottom:15px; color:#65676b;">Create a new account</p>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="text" id="reg-phone" placeholder="Mobile Number">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button onclick="handleRegister()">Sign Up</button>
+            <span class="switch-link" onclick="toggleAuth(true)">Already have an account? Log In</span>
         </div>
 
         <!-- Login Form -->
         <div id="login-card" class="auth-card" style="display:none;">
             <h2>AS Reebook</h2>
-            <p style="margin-bottom:15px; color:#65676b;">লগইন করুন</p>
-            <input type="text" id="login-phone" placeholder="মোবাইল নম্বর">
-            <input type="password" id="login-pass" placeholder="পাসওয়ার্ড">
-            <button onclick="handleLogin()">লগইন করুন</button>
-            <span class="switch-link" onclick="toggleAuth(false)">অ্যাকাউন্ট নেই? সাইন-আপ করুন</span>
+            <p style="margin-bottom:15px; color:#65676b;">Log In to AS Reebook</p>
+            <input type="text" id="login-phone" placeholder="Mobile Number">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button onclick="handleLogin()">Log In</button>
+            <span class="switch-link" onclick="toggleAuth(false)">Don't have an account? Sign Up</span>
         </div>
     </div>
 
@@ -100,7 +124,7 @@
     <div id="app-screen">
         <header>
             <h1>AS Reebook</h1>
-            <button onclick="logout()" style="border:none; background:none; color:#1877f2; font-weight:bold; cursor:pointer;">লগআউট</button>
+            <button onclick="logout()" style="border:none; background:none; color:#1877f2; font-weight:bold; cursor:pointer;">Log Out</button>
         </header>
 
         <!-- Navigation Tabs -->
@@ -108,35 +132,39 @@
             <div class="nav-tab active" onclick="switchTab('feed', this)">🏠</div>
             <div class="nav-tab" onclick="switchTab('friends', this)">👥</div>
             <div class="nav-tab" onclick="switchTab('messenger', this)">💬</div>
+            <div class="nav-tab" onclick="switchTab('profile', this)">👤</div>
         </div>
 
         <!-- Feed Tab -->
         <div id="tab-feed" class="tab-content active">
             <!-- Story Container -->
             <div class="story-container" id="story-list">
-                <div class="story-box add-story" onclick="addStory()">+<br>স্টোরি দিন</div>
+                <label class="story-box add-story">
+                    +<br>Add Story
+                    <input type="file" id="story-file" accept="image/*,video/*" style="display:none;" onchange="uploadStory(this)">
+                </label>
             </div>
 
             <!-- Create Post -->
             <div class="create-post">
-                <textarea id="post-text" rows="2" placeholder="আপনার মনে কি চলছে?"></textarea>
+                <textarea id="post-text" rows="2" placeholder="What's on your mind?"></textarea>
                 <div class="post-actions">
                     <label class="file-btn">
-                        📷 ছবি/ভিডিও
+                        📷 Photo/Video
                         <input type="file" id="post-file" accept="image/*,video/*" style="display:none;" onchange="handleFileSelect()">
                     </label>
                     <span id="file-indicator" style="font-size:12px; color:#65676b;"></span>
-                    <button class="post-submit-btn" onclick="submitPost()">পোস্ট</button>
+                    <button class="post-submit-btn" onclick="submitPost()">Post</button>
                 </div>
             </div>
 
-            <!-- Posts List -->
+            <!-- Feed Posts -->
             <div id="feed-posts"></div>
         </div>
 
         <!-- Friends Tab -->
         <div id="tab-friends" class="tab-content">
-            <h3 style="padding:12px; color:#1877f2;">মানুষ খুঁজুন ও ফ্রেন্ড রিকোয়েস্ট দিন</h3>
+            <h3 style="padding:12px; color:#1877f2;">People You May Know</h3>
             <div id="friends-list"></div>
         </div>
 
@@ -147,25 +175,64 @@
                 <div class="chat-header">
                     <span id="chat-user-name" style="font-weight:bold;"></span>
                     <div>
-                        <button class="btn-small" onclick="startCall('অডিও')">📞</button>
-                        <button class="btn-small" onclick="startCall('ভিডিও')">📹</button>
+                        <button class="btn-small" onclick="startCall('Audio')">📞</button>
+                        <button class="btn-small" onclick="startCall('Video')">📹</button>
                         <button class="btn-small" style="background:#65676b;" onclick="closeChat()">✕</button>
                     </div>
                 </div>
                 <div class="chat-body" id="chat-body"></div>
                 <div class="chat-footer">
-                    <input type="text" id="chat-input" placeholder="মেসেজ লিখুন...">
-                    <button class="btn-small" onclick="sendMessage()" style="margin-left:5px;">পাঠান</button>
+                    <input type="text" id="chat-input" placeholder="Type a message...">
+                    <button class="btn-small" onclick="sendMessage()" style="margin-left:5px;">Send</button>
                 </div>
             </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="tab-profile" class="tab-content">
+            <div class="profile-header">
+                <img id="cover-img" class="cover-photo" src="" alt="">
+                <div class="profile-pic-container">
+                    <div id="profile-img-box" class="profile-pic">U</div>
+                </div>
+            </div>
+            <div class="profile-details">
+                <div class="profile-name" id="profile-name-display">User Name</div>
+                <div class="profile-bio" id="profile-bio-display">No bio added yet.</div>
+                <div class="profile-rel" id="profile-rel-display">Relationship: Single</div>
+                <button class="edit-profile-btn" onclick="openEditProfile()">Edit Profile</button>
+            </div>
+
+            <!-- Profile Edit Form (Hidden) -->
+            <div id="edit-profile-box" style="display:none; padding:15px; background:#f8f9fa; border-bottom:8px solid #f0f2f5;">
+                <h4>Edit Profile Info</h4>
+                <br>
+                <label style="font-size:12px;">Profile Picture:</label>
+                <input type="file" id="upload-profile-pic" accept="image/*" style="margin-bottom:10px;"><br>
+                <label style="font-size:12px;">Cover Photo:</label>
+                <input type="file" id="upload-cover-pic" accept="image/*" style="margin-bottom:10px;"><br>
+                <input type="text" id="edit-bio" placeholder="Add Bio..." style="width:100%; padding:8px; margin-bottom:10px;">
+                <select id="edit-rel" style="width:100%; padding:8px; margin-bottom:10px;">
+                    <option value="Single">Single</option>
+                    <option value="In a Relationship">In a Relationship</option>
+                    <option value="Engaged">Engaged</option>
+                    <option value="Married">Married</option>
+                </select>
+                <button class="btn-small" onclick="saveProfileDetails()">Save Changes</button>
+            </div>
+
+            <div style="padding:15px;">
+                <h3>Your Posts</h3>
+            </div>
+            <div id="my-posts"></div>
         </div>
     </div>
 
     <!-- Call Overlay -->
     <div id="call-modal">
-        <h2 id="call-type-title">কল হচ্ছে...</h2>
+        <h2 id="call-type-title">Calling...</h2>
         <p id="call-user-display" style="margin: 15px 0;"></p>
-        <button class="btn-small" style="background:#dc3545; padding:10px 20px;" onclick="endCall()">কল কাটুন</button>
+        <button class="btn-small" style="background:#dc3545; padding:10px 20px;" onclick="endCall()">End Call</button>
     </div>
 
     <script>
@@ -183,14 +250,14 @@
             const phone = document.getElementById('reg-phone').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
 
-            if(!name || !phone || !pass) return alert("সকল তথ্য পূরণ করুন!");
+            if(!name || !phone || !pass) return alert("Please fill in all fields!");
 
             let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
-            if(users.some(u => u.phone === phone)) return alert("এই নম্বরে আগেই অ্যাকাউন্ট তৈরি করা হয়েছে!");
+            if(users.some(u => u.phone === phone)) return alert("Account already exists with this number!");
 
-            users.push({ name, phone, pass });
+            users.push({ name, phone, pass, bio: '', relationship: 'Single', avatar: '', cover: '', friends: [] });
             localStorage.setItem('fb_users', JSON.stringify(users));
-            alert("রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।");
+            alert("Registration successful! Please log in.");
             toggleAuth(true);
         }
 
@@ -201,12 +268,13 @@
             let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
             let user = users.find(u => u.phone === phone && u.pass === pass);
 
-            if(!user) return alert("ভুল মোবাইল নম্বর বা পাসওয়ার্ড!");
+            if(!user) return alert("Invalid phone number or password!");
 
             currentUser = user;
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
             loadFeed();
+            loadProfile();
         }
 
         function logout() { location.reload(); }
@@ -221,8 +289,99 @@
             if(tabName === 'feed') loadFeed();
             if(tabName === 'friends') loadFriends();
             if(tabName === 'messenger') loadMessenger();
+            if(tabName === 'profile') loadProfile();
         }
 
+        /* Profile Functions */
+        function loadProfile() {
+            document.getElementById('profile-name-display').innerText = currentUser.name;
+            document.getElementById('profile-bio-display').innerText = currentUser.bio || "No bio added yet.";
+            document.getElementById('profile-rel-display').innerText = "Relationship: " + (currentUser.relationship || "Single");
+
+            const avatarBox = document.getElementById('profile-img-box');
+            if(currentUser.avatar) {
+                avatarBox.innerHTML = `<img src="${currentUser.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            } else {
+                avatarBox.innerText = currentUser.name.charAt(0).toUpperCase();
+            }
+
+            if(currentUser.cover) {
+                document.getElementById('cover-img').src = currentUser.cover;
+            }
+
+            loadMyPosts();
+        }
+
+        function openEditProfile() {
+            const box = document.getElementById('edit-profile-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function saveProfileDetails() {
+            const bio = document.getElementById('edit-bio').value;
+            const rel = document.getElementById('edit-rel').value;
+            const picFile = document.getElementById('upload-profile-pic').files[0];
+            const coverFile = document.getElementById('upload-cover-pic').files[0];
+
+            if(bio) currentUser.bio = bio;
+            currentUser.relationship = rel;
+
+            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
+            let userIndex = users.findIndex(u => u.phone === currentUser.phone);
+
+            const updateStorage = () => {
+                if(userIndex !== -1) users[userIndex] = currentUser;
+                localStorage.setItem('fb_users', JSON.stringify(users));
+                loadProfile();
+                document.getElementById('edit-profile-box').style.display = 'none';
+                alert("Profile Updated Successfully!");
+            };
+
+            if(picFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) { currentUser.avatar = e.target.result; if(!coverFile) updateStorage(); };
+                reader.readAsDataURL(picFile);
+            }
+            if(coverFile) {
+                const reader2 = new FileReader();
+                reader2.onload = function(e) { currentUser.cover = e.target.result; updateStorage(); };
+                reader2.readAsDataURL(coverFile);
+            }
+            if(!picFile && !coverFile) updateStorage();
+        }
+
+        /* Story Upload */
+        function uploadStory(input) {
+            const file = input.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let stories = JSON.parse(localStorage.getItem('fb_stories') || "[]");
+                stories.unshift({
+                    author: currentUser.name,
+                    media: e.target.result,
+                    type: file.type.startsWith('video') ? 'video' : 'image'
+                });
+                localStorage.setItem('fb_stories', JSON.stringify(stories));
+                loadStories();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadStories() {
+            let stories = JSON.parse(localStorage.getItem('fb_stories') || "[]");
+            let container = document.getElementById('story-list');
+            let baseHtml = `<label class="story-box add-story">+<br>Add Story<input type="file" id="story-file" accept="image/*,video/*" style="display:none;" onchange="uploadStory(this)"></label>`;
+            
+            stories.forEach(s => {
+                let mediaTag = s.type === 'video' ? `<video src="${s.media}" autoplay loop muted></video>` : `<img src="${s.media}">`;
+                baseHtml += `<div class="story-box">${mediaTag}<span style="position:relative; z-index:2;">${s.author}</span></div>`;
+            });
+            container.innerHTML = baseHtml;
+        }
+
+        /* Post & Reactions */
         function handleFileSelect() {
             const file = document.getElementById('post-file').files[0];
             if(file) {
@@ -238,16 +397,19 @@
 
         function submitPost() {
             const text = document.getElementById('post-text').value.trim();
-            if(!text && !selectedMediaData.url) return alert("কিছু লিখুন বা ছবি/ভিডিও সিলেক্ট করুন!");
+            if(!text && !selectedMediaData.url) return alert("Write something or select a file!");
 
             let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
             posts.unshift({
                 id: Date.now(),
+                authorPhone: currentUser.phone,
                 author: currentUser.name,
+                authorAvatar: currentUser.avatar || '',
                 text: text,
                 media: selectedMediaData.url,
                 mediaType: selectedMediaData.type,
-                likes: 0
+                reactions: { '👍': 0, '❤️': 0, '🥰': 0, '😆': 0, '😮': 0, '😢': 0, '😡': 0 },
+                comments: []
             });
             localStorage.setItem('fb_posts', JSON.stringify(posts));
 
@@ -259,59 +421,131 @@
         }
 
         function loadFeed() {
+            loadStories();
             let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
+            renderPosts(posts, 'feed-posts');
+        }
+
+        function loadMyPosts() {
+            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
+            let myPosts = posts.filter(p => p.authorPhone === currentUser.phone);
+            renderPosts(myPosts, 'my-posts');
+        }
+
+        function renderPosts(posts, containerId) {
             let html = '';
             posts.forEach(p => {
                 let mediaTag = p.media ? (p.mediaType === 'video' ? `<video src="${p.media}" controls class="post-media"></video>` : `<img src="${p.media}" class="post-media">`) : '';
+                let avatarTag = p.authorAvatar ? `<img src="${p.authorAvatar}">` : p.author.charAt(0).toUpperCase();
+
+                let reactionSum = 0;
+                for(let r in p.reactions) reactionSum += p.reactions[r];
+
+                let commentsHtml = '';
+                (p.comments || []).forEach(c => {
+                    commentsHtml += `<div class="comment-item"><strong>${c.user}:</strong> ${c.text}</div>`;
+                });
+
                 html += `
                     <div class="post-card">
                         <div class="post-header">
-                            <div class="avatar">${p.author.charAt(0).toUpperCase()}</div>
+                            <div class="avatar">${avatarTag}</div>
                             <div>
                                 <div class="post-author">${p.author}</div>
-                                <div class="post-time">এইমাত্র</div>
+                                <div class="post-time">Just now</div>
                             </div>
                         </div>
                         <div class="post-text">${p.text}</div>
                         ${mediaTag}
-                        <div class="post-stats"><span>👍 ${p.likes} লাইক</span></div>
+                        <div class="post-stats"><span>Reactions: ${reactionSum}</span><span>${(p.comments || []).length} Comments</span></div>
                         <div class="post-buttons">
-                            <button class="post-btn-action" onclick="likePost(${p.id})">👍 লাইক</button>
+                            <div class="reaction-popover">
+                                <span class="react-btn" onclick="reactPost(${p.id}, '👍')">👍</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '❤️')">❤️</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '🥰')">🥰</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '😆')">😆</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '😮')">😮</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '😢')">😢</span>
+                                <span class="react-btn" onclick="reactPost(${p.id}, '😡')">😡</span>
+                            </div>
+                        </div>
+                        <div class="comments-section">
+                            ${commentsHtml}
+                            <div class="comment-input-box">
+                                <input type="text" id="comment-input-${p.id}" placeholder="Write a comment...">
+                                <button onclick="addComment(${p.id})">Comment</button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
-            document.getElementById('feed-posts').innerHTML = html || '<p style="text-align:center; padding:20px; color:#65676b;">কোনো পোস্ট নেই!</p>';
+            document.getElementById(containerId).innerHTML = html || '<p style="text-align:center; padding:20px; color:#65676b;">No posts available!</p>';
         }
 
-        function likePost(id) {
+        function reactPost(id, type) {
             let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
             let post = posts.find(p => p.id === id);
-            if(post) { post.likes += 1; localStorage.setItem('fb_posts', JSON.stringify(posts)); loadFeed(); }
+            if(post) {
+                if(!post.reactions) post.reactions = { '👍': 0, '❤️': 0, '🥰': 0, '😆': 0, '😮': 0, '😢': 0, '😡': 0 };
+                post.reactions[type] = (post.reactions[type] || 0) + 1;
+                localStorage.setItem('fb_posts', JSON.stringify(posts));
+                loadFeed();
+            }
         }
 
-        function addStory() {
-            alert("স্টোরি যোগ করা হয়েছে!");
-            let list = document.getElementById('story-list');
-            list.innerHTML += `<div class="story-box">${currentUser.name}</div>`;
+        function addComment(id) {
+            let input = document.getElementById('comment-input-' + id);
+            let text = input.value.trim();
+            if(!text) return;
+
+            let posts = JSON.parse(localStorage.getItem('fb_posts') || "[]");
+            let post = posts.find(p => p.id === id);
+            if(post) {
+                if(!post.comments) post.comments = [];
+                post.comments.push({ user: currentUser.name, text: text });
+                localStorage.setItem('fb_posts', JSON.stringify(posts));
+                loadFeed();
+            }
         }
 
+        /* Friends System */
         function loadFriends() {
             let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
             let html = '';
             users.forEach(u => {
                 if(u.phone !== currentUser.phone) {
+                    let isFriend = (currentUser.friends || []).includes(u.phone);
+                    let btnText = isFriend ? "Cancel Request" : "Add Friend";
+                    let btnClass = isFriend ? "btn-small btn-secondary" : "btn-small";
                     html += `
                         <div class="list-item">
                             <div><strong>${u.name}</strong></div>
-                            <button class="btn-small" onclick="alert('ফ্রেন্ড রিকোয়েস্ট পাঠানো হয়েছে!')">রিকোয়েস্ট দিন</button>
+                            <button class="${btnClass}" onclick="toggleFriendRequest('${u.phone}')">${btnText}</button>
                         </div>
                     `;
                 }
             });
-            document.getElementById('friends-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">অন্য কোনো ইউজার নেই।</p>';
+            document.getElementById('friends-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">No other users found.</p>';
         }
 
+        function toggleFriendRequest(phone) {
+            if(!currentUser.friends) currentUser.friends = [];
+            let index = currentUser.friends.indexOf(phone);
+            if(index === -1) {
+                currentUser.friends.push(phone);
+                alert("Friend Request Sent!");
+            } else {
+                currentUser.friends.splice(index, 1);
+                alert("Friend Request Cancelled!");
+            }
+            let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
+            let uIndex = users.findIndex(u => u.phone === currentUser.phone);
+            if(uIndex !== -1) users[uIndex] = currentUser;
+            localStorage.setItem('fb_users', JSON.stringify(users));
+            loadFriends();
+        }
+
+        /* Messenger Functions */
         function loadMessenger() {
             let users = JSON.parse(localStorage.getItem('fb_users') || "[]");
             let html = '';
@@ -320,12 +554,12 @@
                     html += `
                         <div class="list-item">
                             <div><strong>${u.name}</strong></div>
-                            <button class="btn-small" onclick="openChat('${u.phone}', '${u.name}')">মেসেজ</button>
+                            <button class="btn-small" onclick="openChat('${u.phone}', '${u.name}')">Message</button>
                         </div>
                     `;
                 }
             });
-            document.getElementById('messenger-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">অন্য কোনো ইউজার নেই।</p>';
+            document.getElementById('messenger-list').innerHTML = html || '<p style="padding:15px; color:#65676b;">No other users found.</p>';
         }
 
         function openChat(phone, name) {
@@ -367,7 +601,7 @@
         }
 
         function startCall(type) {
-            document.getElementById('call-type-title').innerText = type + " কল হচ্ছে...";
+            document.getElementById('call-type-title').innerText = type + " Calling...";
             document.getElementById('call-user-display').innerText = activeChatFriend.name;
             document.getElementById('call-modal').style.display = 'flex';
         }
