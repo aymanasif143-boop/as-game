@@ -14,7 +14,7 @@
       --subtext: #7f8c8d;
       --border: #e2e8f0;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; }
 
     header {
@@ -32,7 +32,6 @@
       margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border);
     }
 
-    /* Auth Switcher */
     .auth-tabs { display: flex; margin-bottom: 15px; border-bottom: 2px solid var(--border); }
     .auth-tab { flex: 1; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; color: var(--subtext); }
     .auth-tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
@@ -67,30 +66,6 @@
     nav button { background: none; border: none; font-size: 14px; font-weight: bold; color: var(--subtext); cursor: pointer; }
     nav button.active { color: var(--primary); }
   </style>
-
-  <!-- Firebase Scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc, serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDVrjndydq5jgncUsru3L4Lia...",
-      authDomain: "as-reebook.firebaseapp.com",
-      projectId: "as-reebook",
-      storageBucket: "as-reebook.firebasestorage.app",
-      messagingSenderId: "273667897324",
-      appId: "1:273667897324:web:6022245e3d68...",
-      measurementId: "G-CQDZLPMCYH"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.db = db;
-    window.fb = { collection, addDoc, doc, setDoc, getDoc, updateDoc, serverTimestamp };
-  </script>
 </head>
 <body>
 
@@ -98,15 +73,15 @@
 
   <div class="container">
 
-    <!-- Auth View (Login / Signup) -->
+    <!-- Auth View -->
     <div id="authView" class="view active">
       <div class="card">
         <h2 style="text-align: center; color: var(--primary); margin-bottom: 5px;">AS Money Pay</h2>
         <p style="text-align: center; font-size: 13px; color: var(--subtext); margin-bottom: 15px;">আপনাকে স্বাগতম! একাউন্ট তৈরি করুন বা লগইন করুন</p>
         
         <div class="auth-tabs">
-          <div id="tabRegister" class="auth-tab active" onclick="switchAuthTab('register')">রেজিস্ট্রেশন</div>
-          <div id="tabLogin" class="auth-tab" onclick="switchAuthTab('login')">লগইন</div>
+          <div id="tabRegister" class="auth-tab active" onclick="switchTab('register')">রেজিস্ট্রেশন</div>
+          <div id="tabLogin" class="auth-tab" onclick="switchTab('login')">লগইন</div>
         </div>
 
         <!-- Registration Form -->
@@ -117,11 +92,11 @@
           <button class="btn" onclick="sendOTP()">ওটিপি (OTP) পাঠান</button>
         </div>
 
-        <!-- OTP Verification Form -->
-        <div id="otpForm" style="display: none; margin-top: 10px;">
-          <p style="font-size: 14px; color: green; font-weight: bold; text-align: center;">আপনার ফোনে ৪ ডিজিটের ওটিপি পাঠানো হয়েছে!</p>
+        <!-- OTP Form -->
+        <div id="otpForm" style="display: none;">
+          <p style="font-size: 14px; color: green; font-weight: bold; text-align: center; margin-bottom: 8px;">আপনার স্ক্রিনে ওটিপি কোড পাঠানো হয়েছে!</p>
           <input type="number" id="otpInput" placeholder="এখানে ৪ ডিজিটের OTP লিখুন">
-          <button class="btn" onclick="verifyOTPAndRegister()">ভেরিফাই ও রেজিস্ট্রেশন সম্পন্ন করুন</button>
+          <button class="btn" onclick="verifyOTP()">ভেরিফাই ও প্রবেশ করুন</button>
         </div>
 
         <!-- Login Form -->
@@ -136,19 +111,16 @@
 
     <!-- Home View -->
     <div id="homeView" class="view">
-      
       <div class="card" style="background: #eaf2f8; text-align: center;">
         <h3>👋 স্বাগতম, <span id="userNameDisplay">ইউজার</span>!</h3>
         <p style="color: var(--subtext); font-size: 14px; margin-top: 5px;">বর্তমান ব্যালেন্স: <b id="userBalance" style="color: var(--primary);">৳ 0.00</b></p>
       </div>
 
-      <!-- Job Banner -->
       <div class="ad-banner">
         <h3>🎨 টি-শার্ট ও প্যান্ট ডিজাইন জব!</h3>
         <p>আমাদের প্ল্যাটফর্মে টাকা ইনভেস্ট করে ডিজাইন কাজ শুরু করুন। কাজের দক্ষতার ওপর ভিত্তি করে প্রতি মাসে নির্দিষ্ট <b>মাসিক বেতন</b> প্রদান করা হবে!</p>
       </div>
 
-      <!-- Job Rules -->
       <div class="card">
         <h3>💼 কাজের নিয়মাবলী</h3>
         <p style="font-size: 14px; color: var(--subtext); line-height: 1.5; margin-top: 8px;">
@@ -158,13 +130,11 @@
         </p>
       </div>
 
-      <!-- Manager Support -->
       <div class="card" style="border-left: 5px solid #25d366;">
         <h4>Need Help? / কোনো সমস্যা?</h4>
         <p style="font-size: 13px; color: var(--subtext); margin: 5px 0 10px 0;">যেকোনো সাহায্য বা প্রশ্নের জন্য সরাসরি ম্যানেজারের সাথে কথা বলুন।</p>
         <button class="btn btn-support" onclick="contactManager()">💬 ম্যানেজার আসিফের সাথে যোগাযোগ করুন</button>
       </div>
-
     </div>
 
     <!-- Deposit View -->
@@ -203,7 +173,6 @@
 
   </div>
 
-  <!-- Bottom Navigation -->
   <nav id="navBar" style="display:none;">
     <button onclick="nav('homeView')" class="active">🏠 হোম ও জব</button>
     <button onclick="nav('depositView')">📥 ডিপোজিট</button>
@@ -211,19 +180,15 @@
   </nav>
 
   <script>
-    let userData = JSON.parse(localStorage.getItem('as_money_user')) || null;
+    let tempUser = {};
     let generatedOTP = null;
-
-    window.onload = () => {
-      if(userData) loadUserData();
-    };
 
     function nav(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
     }
 
-    function switchAuthTab(type) {
+    function switchTab(type) {
       if(type === 'register') {
         document.getElementById('tabRegister').classList.add('active');
         document.getElementById('tabLogin').classList.remove('active');
@@ -239,123 +204,83 @@
       }
     }
 
-    // OTP Generation
     function sendOTP() {
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
       const pass = document.getElementById('regPassword').value.trim();
 
-      if(!name || !phone || !pass) return alert("দয়া করে নাম, মোবাইল নম্বর এবং পাসওয়ার্ড লিখুন!");
+      if(!name || !phone || !pass) return alert("দয়া করে নাম, নম্বর ও পাসওয়ার্ড পুরোটা দিন!");
 
-      // Generate Random 4 Digit OTP
+      tempUser = { name, phone, pass, balance: 0 };
       generatedOTP = Math.floor(1000 + Math.random() * 9000);
-      alert(`[AS Money Pay OTP]\n\nআপনার ভেরিফিকেশন কোড হলো: ${generatedOTP}`);
+      
+      alert(`[AS Money Pay Verification]\n\nআপনার ওটিপি (OTP) কোড হলো: ${generatedOTP}`);
       
       document.getElementById('registerForm').style.display = 'none';
       document.getElementById('otpForm').style.display = 'block';
     }
 
-    // Verify OTP & Complete Register
-    async function verifyOTPAndRegister() {
-      const inputOTP = document.getElementById('otpInput').value.trim();
-      if(inputOTP != generatedOTP) {
-        return alert("ভুল ওটিপি (OTP) দেওয়া হয়েছে! সঠিক কোডটি লিখুন।");
+    function verifyOTP() {
+      const input = document.getElementById('otpInput').value.trim();
+      if(input == generatedOTP) {
+        localStorage.setItem('as_user_' + tempUser.phone, JSON.stringify(tempUser));
+        localStorage.setItem('as_current_user', JSON.stringify(tempUser));
+        alert("রেজিস্ট্রেশন সফল হয়েছে!");
+        loadApp(tempUser);
+      } else {
+        alert("ভুল OTP দেওয়া হয়েছে!");
       }
-
-      const name = document.getElementById('regName').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const pass = document.getElementById('regPassword').value.trim();
-
-      const { doc, setDoc } = window.fb;
-      userData = { name, phone, password: pass, balance: 0 };
-      await setDoc(doc(window.db, "as_money_users", phone), userData);
-
-      localStorage.setItem('as_money_user', JSON.stringify(userData));
-      alert("রেজিস্ট্রেশন সফল হয়েছে!");
-      loadUserData();
     }
 
-    // Login User
-    async function loginUser() {
+    function loginUser() {
       const phone = document.getElementById('loginPhone').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
 
-      if(!phone || !pass) return alert("ফোন নম্বর ও পাসওয়ার্ড দিন!");
-
-      const { doc, getDoc } = window.fb;
-      const snap = await getDoc(doc(window.db, "as_money_users", phone));
-
-      if(snap.exists()) {
-        const data = snap.data();
-        if(data.password === pass) {
-          userData = data;
-          localStorage.setItem('as_money_user', JSON.stringify(userData));
-          loadUserData();
-        } else {
-          alert("ভুল পাসওয়ার্ড দেওয়া হয়েছে!");
-        }
+      const user = JSON.parse(localStorage.getItem('as_user_' + phone));
+      if(user && user.pass === pass) {
+        localStorage.setItem('as_current_user', JSON.stringify(user));
+        loadApp(user);
       } else {
-        alert("এই নম্বরে কোনো একাউন্ট নেই! আগে রেজিস্ট্রেশন করুন।");
+        alert("নম্বর বা পাসওয়ার্ড ভুল দেওয়া হয়েছে!");
       }
     }
 
-    function loadUserData() {
+    function loadApp(user) {
       document.getElementById('authView').classList.remove('active');
       document.getElementById('homeView').classList.add('active');
       document.getElementById('navBar').style.display = 'flex';
 
-      document.getElementById('userNameDisplay').innerText = userData.name;
-      document.getElementById('userBalance').innerText = `৳ ${userData.balance ? userData.balance.toFixed(2) : '0.00'}`;
+      document.getElementById('userNameDisplay').innerText = user.name;
+      document.getElementById('userBalance').innerText = `৳ ${user.balance.toFixed(2)}`;
     }
 
     function contactManager() {
-      alert("ম্যানেজার আসিফ\nমোবাইল/হোয়াটসঅ্যাপ: 01302868022\n\nযে কোনো হেল্প লাগলে সরাসরি কথা বলুন।");
+      alert("ম্যানেজার আসিফ\nমোবাইল/হোয়াটসঅ্যাপ: 01302868022\n\nযে কোনো সাহায্যের জন্য কল বা মেসেজ দিন।");
     }
 
-    async function submitDeposit() {
-      const amount = parseFloat(document.getElementById('depositAmount').value);
-      const trx = document.getElementById('trxId').value.trim();
-
-      if(!amount || !trx) return alert("টাকার পরিমাণ এবং TrxID দিন!");
-
-      const { collection, addDoc, serverTimestamp } = window.fb;
-      await addDoc(collection(window.db, "deposits"), {
-        phone: userData.phone,
-        name: userData.name,
-        amount: amount,
-        trxId: trx,
-        status: "Pending",
-        createdAt: serverTimestamp()
-      });
-
-      alert("ডিপোজিট রিকোয়েস্ট জমা হয়েছে! যাচাই করে ব্যালেন্স যোগ করা হবে।");
+    function submitDeposit() {
+      const amount = document.getElementById('depositAmount').value;
+      const trx = document.getElementById('trxId').value;
+      if(!amount || !trx) return alert("সব তথ্য পূরণ করুন!");
+      alert("ডিপোজিট রিকোয়েস্ট সফল হয়েছে! খুব শীঘ্রই যাচাই করে ব্যালেন্স যুক্ত করা হবে।");
       document.getElementById('depositAmount').value = '';
       document.getElementById('trxId').value = '';
     }
 
-    async function requestWithdraw() {
-      const amount = parseFloat(document.getElementById('withdrawAmount').value);
-      const account = document.getElementById('accountNumber').value.trim();
-      const method = document.getElementById('method').value;
-
-      if(!amount || !account) return alert("সব তথ্য দিন!");
-      if(amount > userData.balance) return alert("আপনার একাউন্টে পর্যাপ্ত ব্যালেন্স নেই!");
-
-      const { collection, addDoc, serverTimestamp } = window.fb;
-      await addDoc(collection(window.db, "withdraws"), {
-        phone: userData.phone,
-        name: userData.name,
-        amount: amount,
-        method: method,
-        account: account,
-        status: "Pending",
-        createdAt: serverTimestamp()
-      });
-
-      alert("উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
+    function requestWithdraw() {
+      const amount = document.getElementById('withdrawAmount').value;
+      const acc = document.getElementById('accountNumber').value;
+      if(!amount || !acc) return alert("সব তথ্য পূরণ করুন!");
+      alert("উইথড্র রিকোয়েস্ট জমা দেওয়া হয়েছে!");
       document.getElementById('withdrawAmount').value = '';
       document.getElementById('accountNumber').value = '';
     }
+
+    // Auto Login Check
+    window.onload = () => {
+      const curr = JSON.parse(localStorage.getItem('as_current_user'));
+      if(curr) loadApp(curr);
+    };
   </script>
 </body>
 </html>
